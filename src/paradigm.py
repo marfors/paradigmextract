@@ -121,6 +121,7 @@ class Slot:
 
 if __name__ == '__main__':
     p = Paradigm([('1+i+2+er',[]), ('1+a+2',[])],[[('1','spr'),('2','ng')], [('1','st'),('2','ck')]])
+    print p('spr','ng')
     # print the content of the slots
     for (i,s) in enumerate(p.slots()):
         print '%d: %s' % (i," ".join(s.members()))
