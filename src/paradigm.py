@@ -141,7 +141,10 @@ def load_file(file):
                 for vbind in s.split(','):
                     mem.append(tuple(vbind.split('=')))
                 p_members.append(mem[1:])
-            paradigms.append(Paradigm([(w,[]) for w in wfs], p_members))
+            paradigm = Paradigm([(w,[]) for w in wfs], p_members)
+            (name,count) = paradigm.p_info()
+            paradigms.append((count,name,paradigm))
+    paradigms.sort(reverse=True)
     return paradigms
 
 def pr(i,b):
@@ -149,8 +152,8 @@ def pr(i,b):
   else: return '[s] %d' % (i) 
   
 if __name__ == '__main__':
-    for p in load_file('../paradigms/maltese.p'):
-        print ('%s: %d' % p.p_info()).encode('utf-8')
+    for (c,n,p) in load_file('../paradigms/maltese.p'):
+        print ('%s: %d' % (n,c)).encode('utf-8')
         # print the content of the slots
         for (i,s) in enumerate(p.slots()):
             print ('%s: %s' % (pr(i, s.is_var())," ".join(s.members()))).encode('utf-8')
