@@ -1,3 +1,4 @@
+import codecs
 from collections import defaultdict
 
 class Paradigm:
@@ -12,11 +13,21 @@ class Paradigm:
     
     def __init__(self, form_msds, var_insts):
       self.slts = None
+      self.name = None
+      self.count = None
       self.forms = []
       for (f,msd) in form_msds:
           self.forms.append(Form(f,msd))
       self.var_insts = var_insts
 
+    def p_info(self):
+        if self.name != None:
+            return (self.name,self.count)
+        else:
+            self.name = self.__call__(*[s for (_,s) in self.var_insts[0]])[0][0]
+            self.count = len(self.var_insts)
+            return (self.name, self.count)
+              
     def slots(self):
         """Compute the content
          of the slots.
@@ -24,7 +35,8 @@ class Paradigm:
         if self.slts != None:
             return self.slts
         else:
-            str_slots = zip(*[f.strs() for f in self.forms])
+            fs = [f.strs() for f in self.forms]
+            str_slots = zip(*fs)
         vt = defaultdict(list)
         for vs in self.var_insts:
             for (v,s) in vs:
@@ -49,8 +61,6 @@ class Paradigm:
 
     def __str__(self):
         return "#".join([str(f) for f in self.forms])
-
-
                 
 class Form:
     """A class representing a paradigmatic wordform and, possibly, its
@@ -88,12 +98,14 @@ class Form:
         """
         ss = []
         if self.form[0].isdigit():
-           ss.append('')
+           ss.append('_')
         for i in range(len(self.form)):
-            if not(self.form[i].isdigit()) or (len(self.form) < i and self.form[i+1].isdigit()):
-             ss.append(self.form[i])
+            if not(self.form[i].isdigit()): 
+                ss.append(self.form[i])
+            elif i < len(self.form)-1 and self.form[i+1].isdigit():
+                ss.append('_')
         if self.form[-1].isdigit():
-            ss.append('')
+            ss.append('_')
         return ss
         
 class Slot:
@@ -107,22 +119,42 @@ class Slot:
     """
     
     def __init__(self, insts, is_var = True):
-        self.is_var = is_var
+        self.iv = is_var
         self.insts = insts
         
     def is_var(self):
-        return self.is_var
-        
-    def is_str(self):
-        return not(self.is_var)
-
+        return self.iv
+  
     def members(self):
         return self.insts
 
-if __name__ == '__main__':
-    p = Paradigm([('1+i+2+er',[]), ('1+a+2',[])],[[('1','spr'),('2','ng')], [('1','st'),('2','ck')]])
-    print p('spr','ng')
-    # print the content of the slots
-    for (i,s) in enumerate(p.slots()):
-        print '%d: %s' % (i," ".join(s.members()))
 
+def load_file(file):
+    paradigms = []
+    with codecs.open(file,encoding='utf-8') as f:
+        for l in f:
+            (p,ex) = l.strip().split('\t')
+            p_members = []
+            wfs = p.strip().split('#')
+            for s in ex.split('#'):
+                mem = []
+                for vbind in s.split(','):
+                    mem.append(tuple(vbind.split('=')))
+                p_members.append(mem[1:])
+            paradigm = Paradigm([(w,[]) for w in wfs], p_members)
+            (name,count) = paradigm.p_info()
+            paradigms.append((count,name,paradigm))
+    paradigms.sort(reverse=True)
+    return paradigms
+
+def pr(i,b):
+  if b: return '[v] %d' % (i)
+  else: return '[s] %d' % (i) 
+  
+if __name__ == '__main__':
+    for (c,n,p) in load_file('../paradigms/maltese.p'):
+        print ('%s: %d' % (n,c)).encode('utf-8')
+        # print the content of the slots
+        for (i,s) in enumerate(p.slots()):
+            print ('%s: %s' % (pr(i, s.is_var())," ".join(s.members()))).encode('utf-8')
+        print
