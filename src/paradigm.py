@@ -147,20 +147,25 @@ class Slot:
     def members(self):
         return self.insts
 
-
+# [('1+en',[('tense','pres')]
+    
 def load_file(file):
     paradigms = []
     with codecs.open(file,encoding='utf-8') as f:
         for l in f:
             (p,ex) = l.strip().split('\t')
             p_members = []
-            wfs = p.strip().split('#')
+            wfs = []
+            for s in p.split('#'):
+                (w,m) = s.split(':')
+                msd = [tuple(x.split('=')) for x in m.split(',')]
+                wfs.append((w,msd))
             for s in ex.split('#'):
                 mem = []
                 for vbind in s.split(','):
                     mem.append(tuple(vbind.split('=')))
-                p_members.append(mem[1:])
-            paradigm = Paradigm([(w,[]) for w in wfs], p_members)
+                p_members.append(mem)
+            paradigm = Paradigm(wfs, p_members)
             (name,count) = paradigm.p_info()
             paradigms.append((count,name,paradigm))
     paradigms.sort(reverse=True)
@@ -171,7 +176,7 @@ def pr(i,b):
   else: return '[s] %d' % (i) 
   
 if __name__ == '__main__':
-    for (c,n,p) in load_file('../paradigms/maltese.p'):
+    for (c,n,p) in load_file('../paradigms/english.p'):
         print ('%s: %d' % (n,c)).encode('utf-8')
         # print the content of the slots
         for (i,s) in enumerate(p.slots()):
