@@ -279,7 +279,7 @@ def split_tags(tags):
     for form in spl:
         newelement = []
         for tagelement in form:
-            if tagelement == '':
+            if tagelement == u'':
                 newelement.append((unicode(ctr), u'1'))
             elif u'=' in tagelement:
                 splittag = tagelement.split(u'=')
@@ -326,7 +326,7 @@ def learnparadigms(inflectiontables):
         result = reduce(lambda x, y: x & y, wg)
         lcss = result.longestwords
         if not lcss:
-            vartables.append([[table,table,table,[],0,0]])
+            vartables.append(([[table,table,table,[],0,0]], tagtable))
             continue
     
         combos = []
@@ -363,11 +363,13 @@ def learnparadigms(inflectiontables):
                 combos.append([table,c,variabletable,variablelist,numvars,infixcount])
     
         vartables.append((combos,tagtable))
-    
+
     filteredtables = []
+    
     for t, tags in vartables:
         besttable = min(t, key = lambda s: (s[4],s[5]))
         filteredtables.append((besttable,tags))
+
     paradigmlist = collapse_tables(filteredtables)
     
     return paradigmlist
@@ -388,7 +390,7 @@ if __name__ == '__main__':
                 thesetags = []
         else:
             if u'\t' in l:
-                form, tag = l.split()
+                form, tag = l.split(u'\t')
             else:
                 form = l
                 tag = u''
