@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-  
 import codecs
 from collections import defaultdict
 
@@ -60,8 +61,10 @@ class Paradigm:
         return table
 
     def __str__(self):
-        return "#".join([str(f) for f in self.forms])
-                
+        p = "#".join([f.__unicode__() for f in self.forms])
+        v = "#".join([",".join(['%s=%s' % v for v in vs]) for vs in self.var_insts])
+        return ('%s\t%s' % (p,v)).encode('utf-8')
+    
 class Form:
     """A class representing a paradigmatic wordform and, possibly, its
     morphosyntactic description.
@@ -107,7 +110,23 @@ class Form:
         if self.form[-1].isdigit():
             ss.append('_')
         return ss
-        
+
+    def __unicode__(self):
+        ms = []
+        for (t,v) in self.msd:
+            if t != None:
+                if v != None:
+                    ms.append('%s=%s' % (t,v))
+                else:
+                    ms.append(t)
+            else:
+                if v != None:
+                    ms.append(v)
+        if len(ms) == 0:
+            return "+".join(self.form)
+        else:
+            return "%s:%s" % ("+".join(self.form), ",".join(ms))
+
 class Slot:
     """A class representing a slot in a wordform.
 
