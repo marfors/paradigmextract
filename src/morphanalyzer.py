@@ -8,7 +8,7 @@ def escape_fixed_string(string):
     if string == u'_':
         return u'0'
     else:
-        return '{' + string + '}'
+        return u'{' + string + u'}'
     
 for (pcount, pname, paradigm) in paradigms:
     parstrings = []
@@ -18,15 +18,15 @@ for (pcount, pname, paradigm) in paradigms:
         parstring = u''
         for slot in paradigm.slots():
             if slot.is_var():
-                parstring += '?+'
+                parstring += u'?+'
             else:
                 thisslot = escape_fixed_string(slot.members()[formnumber])
                 baseformslot = escape_fixed_string(slot.members()[0])
                 parstring += u' ' + thisslot + u':' + baseformslot + u' '
         parstring += u'0:["[" ' + ' " " '.join(tagstrings) + u' "]"]'
         parstrings.append(parstring)
-    print u'def ' + pname.encode('utf-8') + u'|\n'.join(parstrings) + u';'
+    print (u'def ' + pname + u'|\n'.join(parstrings) + u';').encode('utf-8')
 
-parnames = [pname.encode('utf-8') for (pcount, pname, paradigm) in paradigms]
-print u'def Grammar ' + u'|'.join(parnames) + ';'
+parnames = [pname for (pcount, pname, paradigm) in paradigms]
+print (u'def Grammar ' + u'|'.join(parnames) + ';').encode('utf-8')
 print u'regex Grammar;'
