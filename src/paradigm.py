@@ -25,8 +25,12 @@ class Paradigm:
         if self.name != None:
             return (self.name,self.count)
         else:
-            self.name = self.__call__(*[s for (_,s) in self.var_insts[0]])[0][0]
-            self.count = len(self.var_insts)
+            if len(self.var_insts) != 0:
+                self.name = self.__call__(*[s for (_,s) in self.var_insts[0]])[0][0]
+                self.count = len(self.var_insts)
+            else:
+                self.name = unicode(self.forms[0])
+                self.count = 1
             return (self.name, self.count)
               
     def slots(self):
@@ -47,8 +51,8 @@ class Paradigm:
         (s_index,v_index) = (0,0)
         for i in range(len(str_slots) + len(var_slots)): # interleave strings and variables
             if i % 2 == 0:
-                self.slts.append(Slot(str_slots[s_index],False))    
-                s_index += 1
+                    self.slts.append(Slot(str_slots[s_index],False))    
+                    s_index += 1
             else:
                 self.slts.append(Slot(var_slots[v_index][1]))    
                 v_index += 1
@@ -153,18 +157,25 @@ def load_file(file):
     paradigms = []
     with codecs.open(file,encoding='utf-8') as f:
         for l in f:
-            (p,ex) = l.strip().split('\t')
+            try:
+                (p,ex) = l.strip().split('\t')
+            except:
+                p = l.strip()
+                ex = ''
             p_members = []
             wfs = []
             for s in p.split('#'):
                 (w,m) = s.split(':')
                 msd = [tuple(x.split('=')) for x in m.split(',')]
                 wfs.append((w,msd))
-            for s in ex.split('#'):
-                mem = []
-                for vbind in s.split(','):
-                    mem.append(tuple(vbind.split('=')))
-                p_members.append(mem)
+            if len(ex) > 0:
+                for s in ex.split('#'):
+                    mem = []
+                    for vbind in s.split(','):
+                        mem.append(tuple(vbind.split('=')))
+                    p_members.append(mem)
+            else:
+                p_members = []
             paradigm = Paradigm(wfs, p_members)
             (name,count) = paradigm.p_info()
             paradigms.append((count,name,paradigm))
@@ -176,7 +187,7 @@ def pr(i,b):
   else: return '[s] %d' % (i) 
   
 if __name__ == '__main__':
-    for (c,n,p) in load_file('../paradigms/english.p'):
+    for (c,n,p) in load_file('../paradigms/maltese.p'):
         print ('%s: %d' % (n,c)).encode('utf-8')
         # print the content of the slots
         for (i,s) in enumerate(p.slots()):
