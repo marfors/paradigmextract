@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-  
+import sys
 import codecs
 from collections import defaultdict
 
@@ -174,7 +175,7 @@ def load_file(file):
                     for vbind in s.split(','):
                         mem.append(tuple(vbind.split('=')))
                     p_members.append(mem)
-            else:
+            else: # no variables
                 p_members = []
             paradigm = Paradigm(wfs, p_members)
             (name,count) = paradigm.p_info()
@@ -187,7 +188,7 @@ def pr(i,b):
   else: return '[s] %d' % (i) 
   
 if __name__ == '__main__':
-    for (c,n,p) in load_file('../paradigms/maltese.p'):
+    for (c,n,p) in load_file(sys.argv[1]):
         print ('%s: %d' % (n,c)).encode('utf-8')
         # print the content of the slots
         for (i,s) in enumerate(p.slots()):
