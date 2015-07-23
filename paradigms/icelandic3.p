@@ -1,0 +1,2 @@
+1+ur:N=1,Nom=1,Sg=1,Indef=1#1:N=1,Acc=1,Sg=1,Indef=1#1+i:N=1,Dat=1,Sg=1,Indef=1#1+s:N=1,Gen=1,Sg=1,Indef=1#1+ar:N=1,Nom=1,Pl=1,Indef=1#1+a:N=1,Acc=1,Pl=1,Indef=1#1+um:N=1,Dat=1,Pl=1,Indef=1#1+a:N=1,Gen=1,Pl=1,Indef=1	1=fest#1=hest
+1+a+2+a+3:N=1,Nom=1,Sg=1,Indef=1#1+a+2+a+3:N=1,Acc=1,Sg=1,Indef=1#1+a+2+3+i:N=1,Dat=1,Sg=1,Indef=1#1+a+2+a+3+s:N=1,Gen=1,Sg=1,Indef=1#1+a+2+3+ar:N=1,Nom=1,Pl=1,Indef=1#1+a+2+3+a:N=1,Acc=1,Pl=1,Indef=1#1+ö+2+3+um:N=1,Dat=1,Pl=1,Indef=1#1+a+2+3+a:N=1,Gen=1,Pl=1,Indef=1	1=h,2=m,3=r
