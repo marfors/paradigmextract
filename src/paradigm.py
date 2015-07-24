@@ -30,7 +30,7 @@ class Paradigm:
                 self.name = self.__call__(*[s for (_,s) in self.var_insts[0]])[0][0]
                 self.count = len(self.var_insts)
             else:
-                self.name = unicode(self.forms[0])
+                self.name = self.__call__()[0][0]
                 self.count = 1
             return (self.name, self.count)
               
@@ -115,7 +115,7 @@ class Form:
         if self.form[-1].isdigit():
             ss.append('_')
         return ss
-
+    
     def __unicode__(self):
         ms = []
         for (t,v) in self.msd:
