@@ -4,6 +4,7 @@ import re
 import sys
 import codecs
 from collections import defaultdict
+import regexmatcher
 
 class Paradigm:
     """A class representing a paradigm.
@@ -106,7 +107,7 @@ class Form:
                 r += '.+'
             else:
                 r += f
-        self.regex = re.compile(r)
+        self.regex = r 
 
                  
     def __call__(self,*insts):
@@ -125,7 +126,11 @@ class Form:
         return (w, self.msd)
 
     def match(self,w):
-        return self.regex.match(w)
+        return re.match(self.regex,w)
+    
+    def match_vars(self,w):
+        m = regexmatcher.mregex(r)
+        return m.findall(w)
         
     def strs(self):
         """Collects the strings in a wordform.
