@@ -108,7 +108,7 @@ class Form:
             else:
                 r += f
         self.regex = r 
-
+        self.cregex = re.compile(self.regex)
                  
     def __call__(self,*insts):
         """Instantiate the variables of the wordform.
@@ -126,7 +126,7 @@ class Form:
         return (w, self.msd)
 
     def match(self,w):
-        return re.match(self.regex,w)
+        return self.cregex.match(w)
     
     def match_vars(self,w):
         m = regexmatcher.mregex(r)
