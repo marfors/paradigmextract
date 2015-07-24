@@ -9,12 +9,6 @@ def escape_fixed_string(string):
         return u'0'
     else:
         return u'{' + string + u'}'
-
-def truncate_name(string):
-    if u':' in string:
-        return string[:string.find(u':')]
-    else:
-        return string
         
 for (pcount, pname, paradigm) in paradigms:
     parstrings = []
@@ -28,10 +22,10 @@ for (pcount, pname, paradigm) in paradigms:
                 thisslot = escape_fixed_string(slot.members()[formnumber])
                 baseformslot = escape_fixed_string(slot.members()[0])
                 parstring += u' ' + thisslot + u':' + baseformslot + u' '
-        parstring += u'0:["[" ' + ' " " '.join(tagstrings) + u' "]"]'
+        parstring += u'0:["[" ' + u' " " '.join(tagstrings) + u' "]"]'
         parstrings.append(parstring)
-    print (u'def ' + truncate_name(pname) + u'|\n'.join(parstrings) + u';').encode('utf-8')
+    print (u'def ' + pname + u'|\n'.join(parstrings) + u';').encode('utf-8')
 
-parnames = [truncate_name(pname) for (pcount, pname, paradigm) in paradigms]
-print (u'def Grammar ' + u'|'.join(parnames) + ';').encode('utf-8')
+parnames = [pname for (pcount, pname, paradigm) in paradigms]
+print (u'def Grammar ' + u' | '.join(parnames) + u';').encode('utf-8')
 print u'regex Grammar;'
