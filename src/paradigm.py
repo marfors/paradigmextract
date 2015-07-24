@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-  
+# -*- coding: utf-8 -*-
 
 import re
 import sys
@@ -15,7 +15,7 @@ class Paradigm:
        var_insts:list(tuple)
             Ex: [[('1','dimm')],[('1','dank')], ...]
     """
-    
+
     def __init__(self, form_msds, var_insts):
       self.slts = None
       self.name = None
@@ -36,7 +36,7 @@ class Paradigm:
                 self.name = self.__call__()[0][0]
                 self.count = 1
             return (self.name, self.count)
-              
+
     def slots(self):
         """Compute the content
          of the slots.
@@ -55,10 +55,10 @@ class Paradigm:
         (s_index,v_index) = (0,0)
         for i in range(len(str_slots) + len(var_slots)): # interleave strings and variables
             if i % 2 == 0:
-                    self.slts.append(Slot(str_slots[s_index],False))    
+                    self.slts.append(Slot(str_slots[s_index],False))
                     s_index += 1
             else:
-                self.slts.append(Slot(var_slots[v_index][1]))    
+                self.slts.append(Slot(var_slots[v_index][1]))
                 v_index += 1
         return self.slts
 
@@ -73,20 +73,20 @@ class Paradigm:
             ss = [s for (_,s) in self.var_insts[0]]
         else:
             ss = []
-        return [("+".join(f.form),f(*ss)[0]) for f in self.forms]
+        return [("+".join(f.form),"+".join(f(*ss)[0])) for f in self.forms]
 
-        
     def __call__(self,*insts):
         table = []
         for f in self.forms:
-            table.append(f(*insts))
+            (w,msd) = f(*insts)
+            table.append((''.join(w), msd))
         return table
 
     def __str__(self):
         p = "#".join([f.__unicode__() for f in self.forms])
         v = "#".join([",".join(['%s=%s' % v for v in vs]) for vs in self.var_insts])
         return ('%s\t%s' % (p,v)).encode('utf-8')
-    
+
 class Form:
     """A class representing a paradigmatic wordform and, possibly, its
     morphosyntactic description.
@@ -107,31 +107,31 @@ class Form:
                 r += '.+'
             else:
                 r += f
-        self.regex = r 
+        self.regex = r
         self.cregex = re.compile(self.regex)
-                 
+
     def __call__(self,*insts):
         """Instantiate the variables of the wordform.
            Args:
             insts: fun args
-                   Ex: f('schr','i','b') 
+                   Ex: f('schr','i','b')
         """
-        (w,vindex) = ('',0) 
+        (w,vindex) = ([],0)
         for p in self.form:
             if p.isdigit(): # is a variable
-                w += insts[vindex]
+                w.append(insts[vindex])
                 vindex += 1
             else:
-                w += p
+                w.append(p)
         return (w, self.msd)
-
+    
     def match(self,w):
         return self.cregex.match(w)
-    
+
     def match_vars(self,w):
         m = regexmatcher.mregex(r)
         return m.findall(w)
-        
+
     def strs(self):
         """Collects the strings in a wordform.
            A variable is assumed to be surrounded by (possibly empty) strings.
@@ -140,14 +140,14 @@ class Form:
         if self.form[0].isdigit():
            ss.append('_')
         for i in range(len(self.form)):
-            if not(self.form[i].isdigit()): 
+            if not(self.form[i].isdigit()):
                 ss.append(self.form[i])
             elif i < len(self.form)-1 and self.form[i+1].isdigit():
                 ss.append('_')
         if self.form[-1].isdigit():
             ss.append('_')
         return ss
-    
+
     def __unicode__(self):
         ms = []
         for (t,v) in self.msd:
@@ -173,19 +173,19 @@ class Slot:
         is_var: bool
           Is it a variable slot or not?
     """
-    
+
     def __init__(self, insts, is_var = True):
         self.iv = is_var
         self.insts = insts
-        
+
     def is_var(self):
         return self.iv
-  
+
     def members(self):
         return self.insts
 
 # [('1+en',[('tense','pres')]
-    
+
 def load_file(file):
     paradigms = []
     with codecs.open(file,encoding='utf-8') as f:
@@ -217,8 +217,8 @@ def load_file(file):
 
 def pr(i,b):
   if b: return '[v] %d' % (i)
-  else: return '[s] %d' % (i) 
-  
+  else: return '[s] %d' % (i)
+
 if __name__ == '__main__':
     for (c,n,p) in load_file(sys.argv[1]):
         print ('%s: %d' % (n,c)).encode('utf-8')
