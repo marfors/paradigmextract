@@ -100,6 +100,14 @@ class Form:
     """
     def __init__(self, form, msd=[]):
         (self.form,self.msd) = (form.split('+'), msd)
+        r = ''
+        for f in self.form:
+            if f.isdigit():
+                r += '.+'
+            else:
+                r += f
+        self.regex = re.compile(r)
+
                  
     def __call__(self,*insts):
         """Instantiate the variables of the wordform.
@@ -117,14 +125,7 @@ class Form:
         return (w, self.msd)
 
     def match(self,w):
-        r = ''
-        for f in self.form:
-            if f.isdigit():
-                r += '.+'
-            else:
-                r += f
-        p = re.compile(r)
-        return p.match(w)
+        return self.regex.match(w)
         
     def strs(self):
         """Collects the strings in a wordform.
