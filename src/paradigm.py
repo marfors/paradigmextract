@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-  
+
+import re
 import sys
 import codecs
 from collections import defaultdict
@@ -59,6 +61,12 @@ class Paradigm:
                 v_index += 1
         return self.slts
 
+    def fits_paradigm(self,w):
+        for f in self.forms:
+            if f.match(w):
+                return True
+        return False
+
     def p_forms(self):
         if len(self.var_insts) > 0:
             ss = [s for (_,s) in self.var_insts[0]]
@@ -108,6 +116,16 @@ class Form:
                 w += p
         return (w, self.msd)
 
+    def match(self,w):
+        r = ''
+        for f in self.form:
+            if f.isdigit():
+                r += '.+'
+            else:
+                r += f
+        p = re.compile(r)
+        return p.match(w)
+        
     def strs(self):
         """Collects the strings in a wordform.
            A variable is assumed to be surrounded by (possibly empty) strings.
