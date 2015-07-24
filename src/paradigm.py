@@ -59,6 +59,14 @@ class Paradigm:
                 v_index += 1
         return self.slts
 
+    def p_forms(self):
+        if len(self.var_insts) > 0:
+            ss = [s for (_,s) in self.var_insts[0]]
+        else:
+            ss = []
+        return [("+".join(f.form),f(*ss)[0]) for f in self.forms]
+
+        
     def __call__(self,*insts):
         table = []
         for f in self.forms:
