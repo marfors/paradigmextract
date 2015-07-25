@@ -19,11 +19,11 @@ class wordgraph:
         return grph
 
     """Simple directed graph class where graphs are special types of automata
-       where each state is a final state. 
+       where each state is a final state.
        This is used to quickly find the LCS of a large number of words by
        first converting each word w to an automaton that accepts all substrings
        of w.  Then the automata can be intersected with __and__, and the
-       longest path(s) extracted from the result with _maxpath().       
+       longest path(s) extracted from the result with _maxpath().
     """
 
     def __init__(self, transitions):
@@ -36,7 +36,7 @@ class wordgraph:
                 self.revtrans[self.transitions[(state,sym)]] |= {(state,sym)}
             else:
                 self.revtrans[self.transitions[(state,sym)]] = {(state,sym)}
-                
+
     def __getattr__(self, attr):
         if attr == 'longestwords':
             self._maxpath()
@@ -64,9 +64,9 @@ class wordgraph:
                         nextstate += 1
                         stack.append((atarget,btarget))
                     trans[(statemap[(asource,bsource)], sym)] = statemap[(atarget,btarget)]
-                    
+
         return wordgraph(trans)
-    
+
     def _backtrace(self, maxsources, maxlen, state, tempstring):
         if state not in self.revtrans:
             tempstring.reverse()
@@ -115,34 +115,7 @@ class wordgraph:
 
 ###############################################################################
 
-def rec(word, lcs, posw, posl, inmatch, tempstring):
-    global factors
-    if posw == len(word) and posl != len(lcs):
-        return
-    if posw != len(word) and posl == len(lcs):
-        if inmatch:
-            rec(word, lcs, posw + 1, posl, 0, tempstring + [u']'] + [word[posw]])
-        else:
-            rec(word, lcs, posw + 1, posl, 0, tempstring + [word[posw]])
-        return
 
-    if posw == len(word) and posl == len(lcs):
-        if inmatch:
-            factors.append("".join(tempstring + [u']']))
-        else:
-            factors.append("".join(tempstring))
-        return
-
-    if word[posw] ==  lcs[posl]:
-        if inmatch:
-            rec(word, lcs, posw + 1, posl + 1, 1, tempstring + [word[posw]])
-        else:
-            rec(word, lcs, posw + 1, posl + 1, 1, tempstring + [u'['] + [word[posw]])
-
-    if inmatch:
-        rec(word, lcs, posw + 1, posl, 0, tempstring + [u']'] + [word[posw]])
-    else:
-        rec(word, lcs, posw + 1, posl, 0, tempstring + [word[posw]])
 
 def longest_variable(string):
     thislen = 0
@@ -236,14 +209,14 @@ def evalfact(lcs, c):
             else:
                 if inside:
                     p += 1
-                
+
         allbreaks.append(breaks)
     finalbreaks = [0] * len(lcs)
     for br in allbreaks:
         for idx, val in enumerate(br):
             if val == 1:
                 finalbreaks[idx] = 1
-    
+
     # Extract vars
     vars = []
     currvar = u''
@@ -252,16 +225,46 @@ def evalfact(lcs, c):
         if finalbreaks[idx] == 1:
             vars.append(currvar)
             currvar = u''
-        
+
     numvars = sum(finalbreaks)
     return (numvars, vars)
 
 def findfactors(word, lcs):
     """Recursively finds the different ways to place an LCS in a string."""
-    global factors
+
     word = list(word)
     lcs = list(lcs)
     factors = []
+
+    def rec(word, lcs, posw, posl, inmatch, tempstring):
+        if posw == len(word) and posl != len(lcs):
+            return
+        if posw != len(word) and posl == len(lcs):
+            if inmatch:
+                rec(word, lcs, posw + 1, posl, 0, tempstring + [u']'] + [word[posw]])
+            else:
+                rec(word, lcs, posw + 1, posl, 0, tempstring + [word[posw]])
+            return
+
+        if posw == len(word) and posl == len(lcs):
+            if inmatch:
+                factors.append("".join(tempstring + [u']']))
+            else:
+                factors.append("".join(tempstring))
+            return
+
+        if word[posw] ==  lcs[posl]:
+            if inmatch:
+                rec(word, lcs, posw + 1, posl + 1, 1, tempstring + [word[posw]])
+            else:
+                rec(word, lcs, posw + 1, posl + 1, 1, tempstring + [u'['] + [word[posw]])
+
+        if inmatch:
+            rec(word, lcs, posw + 1, posl, 0, tempstring + [u']'] + [word[posw]])
+        else:
+            rec(word, lcs, posw + 1, posl, 0, tempstring + [word[posw]])
+
+
     rec(word, lcs, 0, 0, 0, [])
     return factors[:]
 
@@ -273,7 +276,7 @@ def vars_to_string(baseform, varlist):
 
 def split_tags(tags):
     spl = [tg.split(u',') for tg in tags]
-        
+
     newforms = []
     ctr = 1
     for form in spl:
@@ -289,8 +292,8 @@ def split_tags(tags):
         newforms.append(newelement)
         ctr += 1
     return newforms
-    
-    
+
+
 def collapse_tables(tables):
     """Input: list of tables
        Output: Collapsed paradigms."""
@@ -310,12 +313,41 @@ def collapse_tables(tables):
             if idx2 != idx and vartable == t2[2]:
                 varstring.append(vars_to_string(t2[0][0], t2[3]))
                 collapsedidx.update({idx2})
-        varstring.append(vars_to_string(t[0][0], t[3])) 
+        varstring.append(vars_to_string(t[0][0], t[3]))
         splittags = split_tags(tags)
         formlist = zip(t[2], splittags)
         p = paradigm.Paradigm(formlist, varstring)
         paradigms.append(p)
     return paradigms
+
+
+def ffilter_lcp(factorlist):
+    flatten = lambda x: [y for l in x for y in flatten(l)] if type(x) is list else [x]
+    lcprefix = lcp(flatten(factorlist))
+    factorlist = [[x for x in w if firstvarmatch(x, lcprefix)] for w in factorlist]
+    return factorlist
+
+def ffilter_shortest_string(factorlist):
+    return [[x for x in w if len(x) == len(min(w, key=len))] for w in factorlist]
+
+def ffilter_shortest_infix(factorlist):
+    return [[x for x in w if count_infixes(x) == count_infixes(min(w, key=lambda x: count_infixes(x)))] for w in factorlist]
+
+def ffilter_longest_single_var(factorlist):
+    return [[x for x in w if longest_variable(x) == longest_variable(max(w, key=lambda x: longest_variable(x)))] for w in factorlist]
+
+def ffilter_leftmost_sum(factorlist):
+    return [[x for x in w if sum(i for i in range(len(x)) if x.startswith('[', i)) == min(map(lambda x: sum(i for i in range(len(x)) if x.startswith('[', i)), w))] for w in factorlist]
+
+
+def filterbracketings(factorlist, functionlist, tablecap):
+    numcombinations = lambda f: reduce(lambda x, y: x*len(y), f, 1)
+    if numcombinations(factorlist) > tablecap:
+        for filterfunc in functionlist:
+            factorlist = filterfunc(factorlist)
+            if numcombinations(factorlist) <= tablecap:
+                break
+    return factorlist
 
 
 def learnparadigms(inflectiontables):
@@ -325,55 +357,33 @@ def learnparadigms(inflectiontables):
         wg = [wordgraph.wordtograph(x) for x in table]
         result = reduce(lambda x, y: x & y, wg)
         lcss = result.longestwords
-        if not lcss:
+        if not lcss: # Table has no LCS - no variables
             vartables.append(([[table,table,table,[],0,0]], tagtable))
             continue
-    
+
         combos = []
         for lcs in lcss:
             factorlist = [findfactors(w, lcs) for w in table]
-            numcombinations = reduce(lambda x, y: x*len(y), factorlist, 1)
-            # Filter out factors that can't be handled quickly
-            if numcombinations > TABLELIMIT:
-                flatten = lambda x: [y for l in x for y in flatten(l)] if type(x) is list else [x]
-                lcprefix = lcp(flatten(factorlist))
-                factorlist = [[x for x in w if firstvarmatch(x, lcprefix)] for w in factorlist]
-                numcombinations = reduce(lambda x, y: x*len(y), factorlist, 1)
-                if numcombinations > TABLELIMIT:
-                    factorlist = [[x for x in w if len(x) == len(min(w, key=len))] for w in factorlist]
-                    numcombinations = reduce(lambda x, y: x*len(y), factorlist, 1)
-                    if numcombinations > TABLELIMIT:
-                        factorlist = [[x for x in w if count_infixes(x) == count_infixes(min(w, key=lambda x: count_infixes(x)))] for w in factorlist]
-                        numcombinations = reduce(lambda x, y: x*len(y), factorlist, 1)
-                        if numcombinations > TABLELIMIT:
-                            factorlist = [[x for x in w if longest_variable(x) == longest_variable(max(w, key=lambda x: longest_variable(x)))] for w in factorlist]
-                            numcombinations = reduce(lambda x, y: x*len(y), factorlist, 1)
-                            if numcombinations > TABLELIMIT:
-    
-                                min(map(lambda x: x.find('['),w))
-                                factorlist = [[x for x in w if x.find(u'[') == min(map(lambda x: x.find('['),w))] for w in factorlist]
-                                numcombinations = reduce(lambda x, y: x*len(y), factorlist, 1)
-                            
-            # Evaluate all combinations of factorizations of LCS
+            factorlist = filterbracketings(factorlist, (ffilter_lcp, ffilter_shortest_string, ffilter_shortest_infix, ffilter_longest_single_var, ffilter_leftmost_sum), TABLELIMIT)
             combinations = itertools.product(*factorlist)
             for c in combinations:
                 (numvars, variablelist) = evalfact(lcs, c)
                 infixcount = reduce(lambda x,y: x + count_infixes(y), c, 0)
                 variabletable = [string_to_varstring(s, variablelist) for s in c]
                 combos.append([table,c,variabletable,variablelist,numvars,infixcount])
-    
+
         vartables.append((combos,tagtable))
 
     filteredtables = []
-    
+
     for t, tags in vartables:
         besttable = min(t, key = lambda s: (s[4],s[5]))
         filteredtables.append((besttable,tags))
 
     paradigmlist = collapse_tables(filteredtables)
-    
+
     return paradigmlist
-    
+
 ###############################################################################
 
 if __name__ == '__main__':
@@ -396,11 +406,10 @@ if __name__ == '__main__':
                 tag = u''
             thistable.append(form)
             thesetags.append(tag)
-    
+
     if len(thistable) > 0:
         tables.append((thistable, thesetags))
 
     learnedparadigms = learnparadigms(tables)
     for p in learnedparadigms:
         print p
-        
