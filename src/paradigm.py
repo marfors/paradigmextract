@@ -69,6 +69,14 @@ class Paradigm:
                 return True
         return False
 
+    def match(self,w,constrained=True):
+        result = []
+        for f in self.forms:
+            xs = f.match_vars(w, constrained)
+            if len(xs) > 0:
+                result.append(xs)
+        return result
+        
     def p_forms(self):
         if len(self.var_insts) > 0:
             ss = [s for (_,s) in self.var_insts[0]]
@@ -105,7 +113,7 @@ class Form:
         r = ''
         for f in self.form:
             if f.isdigit():
-                r += '.+'
+                r += '(.+)'
             else:
                 r += f
         self.regex = r
@@ -138,9 +146,21 @@ class Form:
         return self.cregex.match(w)
 
     def match_vars(self,w, constrained=True):
-        m  = regexmatcher.mregex(r)
-        return [m for m in m.findall(w) if all([r.match(s) for (s,r) in zip(m, self.v_regex)])]
-        
+        matcher = regexmatcher.mregex(self.regex)
+        ms = matcher.findall(w)
+        if not constrained:
+            return ms
+        else:
+            result = []
+            for vs in ms:
+                if type(vs) == str:
+                    var_and_reg = [(vs,self.v_regex[0])]
+                else:
+                    var_and_reg = zip(vs,self.v_regex)
+                if all([r.match(s) for (s,r) in var_and_reg]):
+                    result.append(vs)
+            return result
+                
     def strs(self):
         """Collects the strings in a wordform.
            A variable is assumed to be surrounded by (possibly empty) strings.
