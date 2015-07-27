@@ -142,9 +142,12 @@ class Form:
                 w.append(p)
         return (w, self.msd)
     
-    def match(self,w):
-        return self.cregex.match(w)
-
+    def match(self,w,constrained=True):
+        if not constrained:
+            return self.cregex.match(w)
+        else:
+            return len(self.match_vars(w)) > 0
+        
     def match_vars(self,w, constrained=True):
         matcher = regexmatcher.mregex(self.regex)
         ms = matcher.findall(w)
