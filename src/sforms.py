@@ -10,10 +10,10 @@ def lalign(ss):
     m = max([len(s) for s in ss])
     return [(s+(1+m-len(s))*' ') for s in ss]
 
-def extract_form_information(ps):
+def extract_form_information(ps,only_lemma=False):
     pss = [(n, # paradigm name
             c, # member count
-            p.p_forms(), # form patterns + form insts
+            [p.p_forms()[0]] if only_lemma else p.p_forms(), # form patterns + form insts
             ' '.join(['[%s]' % ",".join(list(set(s.members()))[:5]) for s in p.slots() if s.is_var()])) # slots (< 5 members)
                 for (c,n,p) in ps]
     result = defaultdict(set)
@@ -24,7 +24,7 @@ def extract_form_information(ps):
     result.sort(reverse=True)
     return result
 
-for (n,f,xs) in extract_form_information(paradigm.load_file(sys.argv[1])):
+for (n,f,xs) in extract_form_information(paradigm.load_file(sys.argv[1]),'-l' in sys.argv):
       if len(xs) > 1: # we only print the ambiguous forms.
         xs = sorted(xs,reverse=True)
         wfs = ralign([x[2] for x in xs])
