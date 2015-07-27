@@ -5,6 +5,7 @@ import sys
 import codecs
 from collections import defaultdict
 import regexmatcher
+import genregex
 
 class Paradigm:
     """A class representing a paradigm.
@@ -99,7 +100,7 @@ class Form:
                 [] no msd available
                 [(None,'SGNOM')] no msd type available
     """
-    def __init__(self, form, msd=[]):
+    def __init__(self, form, msd=[], v_insts=[]):
         (self.form,self.msd) = (form.split('+'), msd)
         r = ''
         for f in self.form:
@@ -109,7 +110,15 @@ class Form:
                 r += f
         self.regex = r
         self.cregex = re.compile(self.regex)
-
+        # vars
+        vs = defaultdict(set)
+        for vs in v_insts:
+            for (i,v) in vs:
+                vs[i].add(v)
+        self.v_regex = []
+        for (v,xs) in vs:
+            self.v_regex.append(re.compile(genregex.genregex(xs).pyregex()))
+        
     def __call__(self,*insts):
         """Instantiate the variables of the wordform.
            Args:
@@ -128,10 +137,10 @@ class Form:
     def match(self,w):
         return self.cregex.match(w)
 
-    def match_vars(self,w):
-        m = regexmatcher.mregex(r)
-        return m.findall(w)
-
+    def match_vars(self,w, constrained=True):
+        m  = regexmatcher.mregex(r)
+        return [m for m in m.findall(w) if all([r.match(s) for (s,r) in zip(m, self.v_regex)])]
+                
     def strs(self):
         """Collects the strings in a wordform.
            A variable is assumed to be surrounded by (possibly empty) strings.
