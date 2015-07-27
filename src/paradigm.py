@@ -22,9 +22,9 @@ class Paradigm:
       self.name = None
       self.count = None
       self.forms = []
-      for (f,msd) in form_msds:
-          self.forms.append(Form(f,msd))
       self.var_insts = var_insts
+      for (f,msd) in form_msds:
+          self.forms.append(Form(f,msd,var_insts))
 
     def p_info(self):
         if self.name != None:
@@ -111,14 +111,14 @@ class Form:
         self.regex = r
         self.cregex = re.compile(self.regex)
         # vars
-        vs = defaultdict(set)
+        collect_vars = defaultdict(set)
         for vs in v_insts:
             for (i,v) in vs:
-                vs[i].add(v)
+                collect_vars[i].add(v)
         self.v_regex = []
-        for (v,xs) in vs:
-            self.v_regex.append(re.compile(genregex.genregex(xs).pyregex()))
-        
+        for (_,ss) in collect_vars.iteritems():
+            self.v_regex.append(re.compile(genregex.genregex(ss).pyregex()))
+                        
     def __call__(self,*insts):
         """Instantiate the variables of the wordform.
            Args:
@@ -140,7 +140,7 @@ class Form:
     def match_vars(self,w, constrained=True):
         m  = regexmatcher.mregex(r)
         return [m for m in m.findall(w) if all([r.match(s) for (s,r) in zip(m, self.v_regex)])]
-                
+        
     def strs(self):
         """Collects the strings in a wordform.
            A variable is assumed to be surrounded by (possibly empty) strings.
