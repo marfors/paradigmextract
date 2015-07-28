@@ -3,21 +3,22 @@ class genregex:
     """Generalizes a list of strings into a regex.
        The main strategy is to find those complete strings, suffixes, or
        prefixes in the set that seem to be restricted in their distribution
-       and issue a regular expression (python or foma), that matches a limited
+       and issue a regular expression (Python or foma), that matches a limited
        set of strings.
 
        This is achieved through a number of tests.
        We first make the assumption that strings in a set are drawn from a
        uniform distribution with n members.  Then, we
-       (1) ask how likely it is to draw this particular sequence, assuming the
-       set really has n+1 members (i.e. where we never saw the n+1th member)
-       which is p = 1-(1/(n+1)) ** num_draws
+        (1) ask how likely it is to draw this particular sequence, assuming the
+       set really has n+1 members (i.e. where we never happened to see the
+       n+1th member) which is
+             p = 1-(1/(n+1)) ** num_draws
        where num draws is the length of the list of strings. If this p < 0.05 (by default)
        we assume we have seen all members of the set and declare the set to be fixed.
        
        If the set of members is not found to be fixed, we further investigate
        the suffixes and prefixes in the set. We the find the longest
-        (2a) suffix that can be assumed to be drawn from a fixed set
+        (2a) set of suffixes that can be assumed to be fixed
         (2b) prefix that fulfills the same conditions.
        We also examine the distribution of string lengths. If, by the same analysis,
        the lengths of strings can be assumed to be drawn from a fixed set, we
@@ -27,10 +28,14 @@ class genregex:
        may need to check both the prefix and suffixes separately, which
        is easily done in a foma-style regex since we can intersect the
        prefix and suffix languages separately:
-       [?* suffixes] & [prefixes ?*]
+       
+         [?* suffixes] & [prefixes ?*] & [?^{minlen, maxlen}]
+
        However, this can't be directly done in Python.  To simulate this,
        we check the suffix (and possible length constraints) by a lookahead
-       which doesn't consume any symbols, before the checking the prefix.
+       which doesn't consume any symbols, before the checking the prefix, ie.
+       
+         ^(?=.*suffixes$)(?=.{minlen, maxlen})prefixes
 
        Example:
        >>>words = ['ab','ab','ab','ba','ba','ba','ab','ba','a','b']
@@ -45,8 +50,8 @@ class genregex:
         self.strings = strings
         self.numstrings = len(self.strings)
         self.pvalue = pvalue
-        self.minlen = min(map(lambda x: len(x), self.strings))
-        self.maxlen = max(map(lambda x: len(x), self.strings))
+        self.minlen = min(self.strings, key = len)
+        self.maxlen = max(self.strings, key = len)
         
         self.stringset = set()
         self.prefixset = set()
@@ -90,7 +95,7 @@ class genregex:
         if len(self.prefixset) > 0:
             re.append('[[' + '|'.join(map(explode, self.prefixset)) + '] ?*]')
         if len(re) == 0:
-            return u'?*'
+            return u'?+'
         else:
             return ' & '.join(re)
         
@@ -106,7 +111,7 @@ class genregex:
         if len(self.prefixset) > 0:
             re += '(' + '|'.join(self.prefixset) + ')'
         if len(re) == 0:
-            return u'.*'
+            return u'.+'
         else:
             return '^' + re
                     
