@@ -50,8 +50,8 @@ class genregex:
         self.strings = strings
         self.numstrings = len(self.strings)
         self.pvalue = pvalue
-        self.minlen = min(self.strings, key = len)
-        self.maxlen = max(self.strings, key = len)
+        self.minlen = len(min(self.strings, key = len))
+        self.maxlen = len(max(self.strings, key = len))
         
         self.stringset = set()
         self.prefixset = set()
@@ -74,7 +74,6 @@ class genregex:
                 self.prefixset = set(prefstrings)
                 break
         # Case (2c): find out if stringlengths have limited distribution
-        lenrange = []
         stringlengths = self.maxlen - self.minlen
         if self._significancetest(self.numstrings, stringlengths):
             self.lenrange = (self.minlen, self.maxlen)
