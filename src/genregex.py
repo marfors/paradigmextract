@@ -86,7 +86,7 @@ class genregex:
         
         re = []
         if len(self.stringset) > 0:
-            return '[' + u'|'.join(self.stringset) + ']'
+            return '[' + u'|'.join(map(explode, self.stringset)) + ']'
         if len(self.suffixset) > 0:
             re.append('[?* [' + '|'.join(map(explode, self.suffixset)) + ']]')
         if len(self.lenrange) > 0:
