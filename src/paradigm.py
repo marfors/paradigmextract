@@ -108,12 +108,14 @@ class Form:
     """
     def __init__(self, form, msd=[], v_insts=[]):
         (self.form,self.msd) = (form.split('+'), msd)
+        self.scount = 0
         r = ''
         for f in self.form:
             if f.isdigit():
                 r += '(.+)'
             else:
                 r += f
+                self.scount += len(f)
         self.regex = r
         self.cregex = re.compile(self.regex)
         # vars
@@ -159,7 +161,7 @@ class Form:
         matcher = regexmatcher.mregex(self.regex)
         ms = matcher.findall(w)
         if not constrained:
-            return ms
+            return [(self.scount, m) for m in ms]
         else:
             result = []
             for vs in ms:
@@ -167,8 +169,17 @@ class Form:
                     var_and_reg = [(vs,self.v_regex[0])]
                 else:
                     var_and_reg = zip(vs,self.v_regex)
-                if all([r.match(s) for (s,r) in var_and_reg]): # specificity score
-                    result.append(vs)
+                vcount = 0
+                m_all = True
+                for (s,r) in var_and_reg:
+                    xs = r.findall(s)
+                    if len(xs) > 0:
+                        vcount += max([len("".join(x)) for x in xs]) # select the vmatch with maximal specificity
+                    else:
+                        m_all = False
+                        break
+                if m_all:
+                    result.append((self.scount+vcount, vs))
             return result
                 
     def strs(self):
