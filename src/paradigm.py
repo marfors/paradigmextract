@@ -18,50 +18,48 @@ class Paradigm:
     """
 
     def __init__(self, form_msds, var_insts):
-      self.slts = None
-      self.name = None
-      self.count = None
+      self.p_info = {}
       self.forms = []
       self.var_insts = var_insts
       for (f,msd) in form_msds:
           self.forms.append(Form(f,msd,var_insts))
 
-    def p_info(self):
-        if self.name != None:
-            return (self.name,self.count)
+    def info(self):
+        if len(self.p_info) > 0: # Compute only once.
+            return self.p_info
         else:
             if len(self.var_insts) != 0:
-                self.name = self.__call__(*[s for (_,s) in self.var_insts[0]])[0][0]
-                self.count = len(self.var_insts)
-            else:
-                self.name = self.__call__()[0][0]
-                self.count = 1
-            return (self.name, self.count)
+                self.p_info['name'] = self.__call__(*[s for (_,s) in self.var_insts[0]])[0][0]
+                self.p_info['count'] = len(self.var_insts)
+            else: # no variables
+                self.p_info['name'] = self.__call__()[0][0]
+                self.p_info['count'] = 1
+            self.p_info['slots'] = self.__slots()
+            return self.p_info
 
-    def slots(self):
+    def __slots(self):
+        slts = []
         """Compute the content
          of the slots.
         """
-        if self.slts != None:
-            return self.slts
-        else:
-            fs = [f.strs() for f in self.forms]
-            str_slots = zip(*fs)
+        # string slots
+        fs = [f.strs() for f in self.forms]
+        str_slots = zip(*fs)
+        # var slots
         vt = defaultdict(list)
         for vs in self.var_insts:
             for (v,s) in vs:
                 vt[v].append(s)
         var_slots = vt.items()
-        self.slts = []
         (s_index,v_index) = (0,0)
         for i in range(len(str_slots) + len(var_slots)): # interleave strings and variables
             if i % 2 == 0:
-                    self.slts.append(Slot(str_slots[s_index],False))
+                    slts.append((False,str_slots[s_index]))
                     s_index += 1
             else:
-                self.slts.append(Slot(var_slots[v_index][1]))
+                slts.append((True,var_slots[v_index][1]))
                 v_index += 1
-        return self.slts
+        return slts
 
     def fits_paradigm(self,w):
         for f in self.forms:
@@ -77,12 +75,12 @@ class Paradigm:
                 result.append(xs)
         return result
         
-    def p_forms(self):
+    def paradigm_forms(self):
         if len(self.var_insts) > 0:
             ss = [s for (_,s) in self.var_insts[0]]
         else:
             ss = []
-        return [("+".join(f.form),"+".join(f(*ss)[0])) for f in self.forms]
+        return [f.shapes(ss) for f in self.forms]
 
     def __call__(self,*insts):
         table = []
@@ -126,7 +124,16 @@ class Form:
         self.v_regex = []
         for (_,ss) in collect_vars.iteritems():
             self.v_regex.append(re.compile(genregex.genregex(ss).pyregex()))
-                        
+
+    def shapes(self, ss):
+        w = "".join(self.__call__(*ss)[0])
+        return {'form':"+".join(self.form),
+                'msd':self.msd,
+                'w':w,
+                'regex':self.regex,
+                'cregex':self.cregex,
+                'v_regex':self.v_regex}
+                                    
     def __call__(self,*insts):
         """Instantiate the variables of the wordform.
            Args:
@@ -196,28 +203,6 @@ class Form:
         else:
             return "%s:%s" % ("+".join(self.form), ",".join(ms))
 
-class Slot:
-    """A class representing a slot in a wordform.
-
-       Args:
-        insts: list(str)
-          Ex: ['spr','st']
-        is_var: bool
-          Is it a variable slot or not?
-    """
-
-    def __init__(self, insts, is_var = True):
-        self.iv = is_var
-        self.insts = insts
-
-    def is_var(self):
-        return self.iv
-
-    def members(self):
-        return self.insts
-
-# [('1+en',[('tense','pres')]
-
 def load_file(file):
     paradigms = []
     with codecs.open(file,encoding='utf-8') as f:
@@ -242,8 +227,8 @@ def load_file(file):
             else: # no variables
                 p_members = []
             paradigm = Paradigm(wfs, p_members)
-            (name,count) = paradigm.p_info()
-            paradigms.append((count,name,paradigm))
+            info = paradigm.info()
+            paradigms.append((info['count'],info['name'],paradigm))
     paradigms.sort(reverse=True)
     return paradigms
 
@@ -255,6 +240,6 @@ if __name__ == '__main__':
     for (c,n,p) in load_file(sys.argv[1]):
         print ('%s: %d' % (n,c)).encode('utf-8')
         # print the content of the slots
-        for (i,s) in enumerate(p.slots()):
-            print ('%s: %s' % (pr(i, s.is_var())," ".join(s.members()))).encode('utf-8')
+        for (i,(is_var, s)) in enumerate(p.info()['slots']):
+            print ('%s: %s' % (pr(i, is_var)," ".join(s))).encode('utf-8')
         print
