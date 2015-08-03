@@ -24,9 +24,9 @@ class Paradigm:
       for (f,msd) in form_msds:
           self.forms.append(Form(f,msd,var_insts))
 
-    def info(self):
+    def __getattr__(self,attr):
         if len(self.p_info) > 0: # Compute only once.
-            return self.p_info
+            return self.p_info[attr]
         else:
             if len(self.var_insts) != 0:
                 self.p_info['name'] = self.__call__(*[s for (_,s) in self.var_insts[0]])[0][0]
@@ -35,7 +35,7 @@ class Paradigm:
                 self.p_info['name'] = self.__call__()[0][0]
                 self.p_info['count'] = 1
             self.p_info['slots'] = self.__slots()
-            return self.p_info
+        return self.p_info[attr]
 
     def __slots(self):
         slts = []
@@ -167,7 +167,7 @@ class Form:
                     var_and_reg = [(vs,self.v_regex[0])]
                 else:
                     var_and_reg = zip(vs,self.v_regex)
-                if all([r.match(s) for (s,r) in var_and_reg]):
+                if all([r.match(s) for (s,r) in var_and_reg]): # specificity score
                     result.append(vs)
             return result
                 
@@ -227,8 +227,7 @@ def load_file(file):
             else: # no variables
                 p_members = []
             paradigm = Paradigm(wfs, p_members)
-            info = paradigm.info()
-            paradigms.append((info['count'],info['name'],paradigm))
+            paradigms.append((paradigm.count,paradigm.name,paradigm))
     paradigms.sort(reverse=True)
     return paradigms
 
@@ -240,6 +239,6 @@ if __name__ == '__main__':
     for (c,n,p) in load_file(sys.argv[1]):
         print ('%s: %d' % (n,c)).encode('utf-8')
         # print the content of the slots
-        for (i,(is_var, s)) in enumerate(p.info()['slots']):
+        for (i,(is_var, s)) in enumerate(p.slots):
             print ('%s: %s' % (pr(i, is_var)," ".join(s))).encode('utf-8')
         print
