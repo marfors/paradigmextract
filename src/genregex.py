@@ -57,6 +57,7 @@ class genregex:
         self.prefixset = set()
         self.suffixset = set()
         self.lenrange = ()
+        
         # Case (1): if the totality of strings seems to have a limited distribution
         if self._significancetest(self.numstrings, len(set(self.strings))):
             self.stringset = set(self.strings)
@@ -74,8 +75,8 @@ class genregex:
                 self.prefixset = set(prefstrings)
                 break
         # Case (2c): find out if stringlengths have limited distribution
-        stringlengths = self.maxlen - self.minlen
-        if self._significancetest(self.numstrings, stringlengths):
+        stringlengths = set(map(lambda x: len(x), self.strings))
+        if self._significancetest(self.numstrings, len(stringlengths)):
             self.lenrange = (self.minlen, self.maxlen)
         return
 
