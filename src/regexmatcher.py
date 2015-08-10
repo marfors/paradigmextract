@@ -27,7 +27,7 @@ class mregex:
         self.results = []
         self.match(strindex, regindex, [])
         ret = [tuple(self.text[i:j] for i,j in r) for r in self.results]
-        return [r if len(r) > 1 else r[0] for r in ret]
+        return ret
     
     def match(self, strindex, regindex, groups):
         # Are we at end of regex _and_ text?
