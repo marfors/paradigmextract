@@ -67,7 +67,7 @@ def paradigms_to_foma(paradigms, grammarname, pval):
             parstrings.append(parstring)
         rstring += u'def ' + nospace(paradigm.name) + u'|\n'.join(parstrings) + u';\n'
 
-    parnames = [nospace(paradigm.pname) for paradigm in paradigms if ' ' not in paradigm.name]
+    parnames = [nospace(paradigm.name) for paradigm in paradigms if ' ' not in paradigm.name]
     rstring += u'def ' + grammarname + u' ' + u' | '.join(parnames) + u';'
 
     return alphstring + defstring + rstring
