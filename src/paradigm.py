@@ -61,20 +61,23 @@ class Paradigm:
                 v_index += 1
         return slts
 
-    def fits_paradigm(self,w):
+    def fits_paradigm(self,w, selection=None, constrained=True):
         for f in self.forms:
-            if f.match(w):
+            if f.match(w,positions,constrained):
                 return True
         return False
 
-    def match(self,w,constrained=True):
+    def match(self,w, selection=None, constrained=True):
         result = []
-        for f in self.forms:
+        if selection == None:
+            forms = self.forms
+        else:
+            forms = [self.forms[i]  for i in selection]
+        for f in forms:
             xs = f.match_vars(w, constrained)
-            if len(xs) > 0:
-                result.append(xs)
+            result.append(xs)
         return result
-        
+
     def paradigm_forms(self):
         if len(self.var_insts) > 0:
             ss = [s for (_,s) in self.var_insts[0]]
@@ -174,7 +177,8 @@ class Form:
                 for (s,r) in var_and_reg:
                     xs = r.findall(s)
                     if len(xs) > 0:
-                        vcount += max([len("".join(x)) for x in xs]) # select the vmatch with maximal specificity
+                        if r.pattern != '.+':
+                            vcount += max([len("".join(x)) for x in xs]) # select the vmatch with maximal specificity
                     else:
                         m_all = False
                         break
@@ -240,7 +244,7 @@ def load_file(file):
             paradigm = Paradigm(wfs, p_members)
             paradigms.append((paradigm.count,paradigm.name,paradigm))
     paradigms.sort(reverse=True)
-    return paradigms
+    return [p for (_,_,p) in paradigms]
 
 def pr(i,b):
   if b: return '[v] %d' % (i)
