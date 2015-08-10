@@ -29,7 +29,7 @@ def nospace(string):
 def paradigms_to_alphabet(paradigms):
     """Extracts all used symbols from an iterable of paradigms."""
     alphabet = set()
-    for (pcount, pname, paradigm) in paradigms:
+    for paradigm in paradigms:
           for idx, (is_var, slot) in enumerate(paradigm.slots):
                 for word in slot:
                     alphabet |= set(word)
