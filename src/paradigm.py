@@ -251,8 +251,8 @@ def pr(i,b):
   else: return '[s] %d' % (i)
 
 if __name__ == '__main__':
-    for (c,n,p) in load_file(sys.argv[1]):
-        print ('%s: %d' % (n,c)).encode('utf-8')
+    for p in load_file(sys.argv[1]):
+        print ('%s: %d' % (p.name,p.count)).encode('utf-8')
         # print the content of the slots
         for (i,(is_var, s)) in enumerate(p.slots):
             print ('%s: %s' % (pr(i, is_var)," ".join(s))).encode('utf-8')

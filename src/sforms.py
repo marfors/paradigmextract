@@ -11,11 +11,11 @@ def lalign(ss):
     return [(s+(1+m-len(s))*' ') for s in ss]
 
 def extract_form_information(ps,only_lemma=False):
-    pss = [(n, # paradigm name
-            c, # member count
+    pss = [(p.name, # paradigm name
+            p.count, # member count
             [p.paradigm_forms()[0]] if only_lemma else p.paradigm_forms(), # form patterns + form insts
             ' '.join(['[%s]' % ",".join(list(set(s))[:5]) for (is_var,s) in p.slots if is_var])) # slots (< 5 members)
-                for (c,n,p) in ps]
+                for p in ps]
     result = defaultdict(set)
     for (n1,c,fs,s) in pss:
         for shape in fs:
