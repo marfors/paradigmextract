@@ -29,7 +29,7 @@ def nospace(string):
 def paradigms_to_alphabet(paradigms):
     """Extracts all used symbols from an iterable of paradigms."""
     alphabet = set()
-    for (pcount, pname, paradigm) in paradigms:
+    for paradigm in paradigms:
           for idx, (is_var, slot) in enumerate(paradigm.slots):
                 for word in slot:
                     alphabet |= set(word)
@@ -46,16 +46,14 @@ def paradigms_to_foma(paradigms, grammarname, pval):
     alphabet = {'"' + a + '"' for a in alphabet}
     alphstring = 'def Alph ' + u'|'.join(alphabet) + ';\n'
 
-    for (pcount, pname, paradigm) in paradigms:
-        if ' ' in pname:
-            continue
+    for paradigm in paradigms:
         parstrings = []
         for formnumber, form in enumerate(paradigm.forms):
             tagstrings = map(lambda(feature, value): u'"' + feature + u'"' + u' = ' + u'"' + value + u'"' , form.msd)
             parstring = u''
             for idx, (is_var, slot) in enumerate(paradigm.slots):
                 if is_var:
-                    parvarname = nospace(pname) + '=var' + str(idx)
+                    parvarname = nospace(paradigm.name) + '=var' + str(idx)
                     if parvarname not in parvars:
                         r = genregex.genregex(slot, pvalue = pval)
                         parvars[parvarname] = True
@@ -67,9 +65,9 @@ def paradigms_to_foma(paradigms, grammarname, pval):
                     parstring += u' [' + thisslot + u':' + baseformslot + u'] '
             parstring += u'0:["[" ' + u' " " '.join(tagstrings) + u' "]"]'
             parstrings.append(parstring)
-        rstring += u'def ' + nospace(pname) + u'|\n'.join(parstrings) + u';\n'
+        rstring += u'def ' + nospace(paradigm.name) + u'|\n'.join(parstrings) + u';\n'
 
-    parnames = [nospace(pname) for (pcount, pname, paradigm) in paradigms if ' ' not in pname]
+    parnames = [nospace(paradigm.name) for paradigm in paradigms if ' ' not in paradigm.name]
     rstring += u'def ' + grammarname + u' ' + u' | '.join(parnames) + u';'
 
     return alphstring + defstring + rstring
