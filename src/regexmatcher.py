@@ -25,13 +25,16 @@ class mregex:
         self.text = text
         self.textlen = len(text)
         self.results = []
+        self.matched = 0
         self.match(strindex, regindex, [])
-        ret = [tuple(self.text[i:j] for i,j in r) for r in self.results]
-        return ret
+        if self.matched:
+            return [tuple(self.text[i:j] for i,j in r) for r in self.results]
+        return None
     
     def match(self, strindex, regindex, groups):
         # Are we at end of regex _and_ text?
         if strindex == self.textlen and regindex == self.regexlen:
+            self.matched = 1
             if groups:
                 self.results.append(groups)
             return
