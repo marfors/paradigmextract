@@ -117,7 +117,7 @@ def main(argv):
                 for form, msd in table:
                     msdprint = ','.join([m[0] + '=' + m[1] for m in msd])
                     print (form + '\t' + msdprint).encode("utf-8")
-            print
+        print
 
 if __name__ == "__main__":
     main(sys.argv)
