@@ -158,11 +158,13 @@ class Form:
         if not constrained:
             return self.cregex.match(w)
         else:
-            return len(self.match_vars(w)) > 0
+            return self.match_vars(w) != None
         
     def match_vars(self,w, constrained=True):
         matcher = regexmatcher.mregex(self.regex)
         ms = matcher.findall(w)
+        if ms == None:
+                return None
         if not constrained:
             return [(self.scount, m) for m in ms]
         else:
@@ -175,7 +177,10 @@ class Form:
                 vcount = 0
                 m_all = True
                 for (s,r) in var_and_reg:
-                    xs = r.findall(s)
+                    m = r.search(s)
+                    if m == None:
+                            return None
+                    xs = m.groups()
                     if len(xs) > 0:
                         if r.pattern != '.+':
                             vcount += max([len("".join(x)) for x in xs]) # select the vmatch with maximal specificity
