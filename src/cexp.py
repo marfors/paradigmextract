@@ -37,7 +37,11 @@ for t in ds:
                     correct = len([(w1,w2) for (w1,w2) in zip([w for (w,_) in p(*bs)],t) if w1 == w2])
                     w_result[1].append((sc, p.count, p.name, var_annot(bs), 100*float(correct)/tlen))
     w_result[1].sort(key=lambda res:(res[0],res[1]), reverse=True)
-    exp.append(w_result)
+    if len(w_result[1]) > 0:
+        acc = w_result[1][0][4]
+    else:
+        acc = 0.0
+    exp.append((acc,w_result))
 
 exp.sort(reverse=True)
 
@@ -45,11 +49,7 @@ form = 0
 tot = 0
 table = 0
 
-for w_result in exp:
-        if len(w_result[1]) > 0:
-            acc = w_result[1][0][4]
-        else:
-            acc = 0.0
+for (acc,w_result) in exp:
         tot += 1
         form += acc
         print ('%s\n   %.1f%s\t%s\t%s\t%d\t%d' % (w_result[0], acc,'%', w_result[1][0][2], w_result[1][0][3], w_result[1][0][0], w_result[1][0][1])).encode('utf-8')
