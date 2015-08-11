@@ -32,7 +32,7 @@ for t in ds:
         if bf_match == None:
             bf_match = p.match(t[0],[0],constrained=False)[0] 
         if bf_match != None:
-                for (sc,bs) in bf_match:
+                for (sc,bs) in bf_match[::-1]:
                     tlen = len(t)
                     correct = len([(w1,w2) for (w1,w2) in zip([w for (w,_) in p(*bs)],t) if w1 == w2])
                     w_result[1].append((sc, p.count, p.name, var_annot(bs), 100*float(correct)/tlen))
