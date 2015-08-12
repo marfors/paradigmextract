@@ -61,9 +61,9 @@ class Paradigm:
                 v_index += 1
         return slts
 
-    def fits_paradigm(self,w, selection=None, constrained=True):
+    def fits_paradigm(self,w, constrained=True):
         for f in self.forms:
-            if f.match(w, selection,constrained):
+            if f.match(w, constrained):
                 return True
         return False
 
@@ -155,10 +155,7 @@ class Form:
         return (w, self.msd)
     
     def match(self,w,constrained=True):
-        if not constrained:
-            return self.cregex.match(w)
-        else:
-            return self.match_vars(w) != None
+            return self.match_vars(w,constrained) != None
         
     def match_vars(self,w, constrained=True):
         matcher = regexmatcher.mregex(self.regex)
@@ -177,7 +174,7 @@ class Form:
                 vcount = 0
                 m_all = True
                 for (s,r) in var_and_reg:
-                    m = r.search(s)
+                    m = r.match(s)
                     if m == None:
                             return None
                     xs = m.groups() # .+-matches have no grouping
