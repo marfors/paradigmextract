@@ -63,7 +63,7 @@ class Paradigm:
 
     def fits_paradigm(self,w, selection=None, constrained=True):
         for f in self.forms:
-            if f.match(w,positions,constrained):
+            if f.match(w, selection,constrained):
                 return True
         return False
 
