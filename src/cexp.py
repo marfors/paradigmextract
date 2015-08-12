@@ -52,15 +52,18 @@ table = 0
 for (acc,w_result) in exp:
         tot += 1
         form += acc
+        found_paradigm = '   PARADIGM NOT FOUND\n'
         print ('%s\n   %.2f%s\t%s\t%s\t%d\t%d' % (w_result[0], acc,'%', w_result[1][0][2], w_result[1][0][3], w_result[1][0][0], w_result[1][0][1])).encode('utf-8')
         if int(acc) == 100:
                 table += 1
+                found_paradigm = ''
         else:
                 for res in w_result[1][1:]:
                         print ('   %.2f%s\t%s\t%s\t%d\t%d' % (res[4],'%', res[2], res[3], res[0], res[1])).encode('utf-8')
                         if int(res[4]) == 100:
+                                found_paradigm = ''
                                 break
-        print
+        print found_paradigm
 print '== result =='
 print 'table: %.2f%s' % (100*float(table)/tot,'%')
 print 'form: %.2f%s' % (form/tot,'%')
