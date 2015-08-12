@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import paradigm
 from collections import defaultdict
 import sys

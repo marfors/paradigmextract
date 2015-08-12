@@ -16,6 +16,7 @@ class Paradigm:
        var_insts:list(tuple)
             Ex: [[('1','dimm')],[('1','dank')], ...]
     """
+    
 
     def __init__(self, form_msds, var_insts):
       self.p_info = {}
@@ -162,6 +163,8 @@ class Form:
         ms = matcher.findall(w)
         if ms == None:
                 return None
+        elif ms == []:
+            return []
         if not constrained:
             return [(self.scount, m) for m in ms]
         else:
@@ -186,8 +189,11 @@ class Form:
                         break
                 if m_all:
                     result.append((self.scount+vcount, vs))
-            return result
-                
+            if result == []:
+                return None
+            else:
+                return result
+            
     def strs(self):
         """Collects the strings in a wordform.
            A variable is assumed to be surrounded by (possibly empty) strings.
