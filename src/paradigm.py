@@ -7,6 +7,15 @@ from collections import defaultdict
 import regexmatcher
 import genregex
 
+def overlap(ss):
+    count = 0
+    for (c1,c2) in zip(prefix[::-1],suffix):
+        if c1 == c2:
+            count += 1
+        else:
+            return count
+    return count
+
 class Paradigm:
     """A class representing a paradigm.
 
@@ -129,7 +138,7 @@ class Form:
                 collect_vars[i].add(v)
         self.v_regex = []
         for (_,ss) in collect_vars.iteritems():
-            self.v_regex.append(re.compile(genregex.genregex(ss).pyregex()))
+            self.v_regex.append(re.compile(genregex.genregex(ss,pvalue=0.05).pyregex()))
 
     def shapes(self, ss):
         w = "".join(self.__call__(*ss)[0])
@@ -183,7 +192,7 @@ class Form:
                     xs = m.groups() # .+-matches have no grouping
                     if len(xs) > 0 or r.pattern == '.+':
                         if r.pattern != '.+':
-                            vcount += max([len("".join(x)) for x in xs]) # select the vmatch with maximal specificity
+                            vcount += len("".join(xs)) # select the variable specificity
                     else:
                         m_all = False
                         break
@@ -193,7 +202,7 @@ class Form:
                 return None
             else:
                 return result
-            
+
     def strs(self):
         """Collects the strings in a wordform.
            A variable is assumed to be surrounded by (possibly empty) strings.
