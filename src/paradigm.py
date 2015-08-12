@@ -180,8 +180,8 @@ class Form:
                     m = r.search(s)
                     if m == None:
                             return None
-                    xs = m.groups()
-                    if len(xs) > 0:
+                    xs = m.groups() # .+-matches have no grouping
+                    if len(xs) > 0 or r.pattern == '.+':
                         if r.pattern != '.+':
                             vcount += max([len("".join(x)) for x in xs]) # select the vmatch with maximal specificity
                     else:
