@@ -268,9 +268,24 @@ def pr(i,b):
   else: return '[s] %d' % (i)
 
 if __name__ == '__main__':
-    for p in load_file(sys.argv[1]):
-        print ('%s: %d' % (p.name,p.count)).encode('utf-8')
-        # print the content of the slots
-        for (i,(is_var, s)) in enumerate(p.slots):
-            print ('%s: %s' % (pr(i, is_var)," ".join(s))).encode('utf-8')
-        print
+    if '-p' in sys.argv:
+        for p in load_file(sys.argv[-1]):
+            print ('name: %s, count: %d' % (p.name,p.count)).encode('utf-8')
+            if len(p.var_insts) > 0:
+                print ('members: %s' % (", ".join([p(*[v[1] for v in vs])[0][0] for vs in p.var_insts]))).encode('utf-8')
+            else:
+                print ('members: %s' % (p()[0][0])).encode('utf-8')
+            for f in p.forms:
+                print unicode(f).replace(':','\t').encode('utf-8')
+            print
+    elif '-s' in sys.argv:
+        for p in load_file(sys.argv[-1]):
+            print ('%s: %d' % (p.name,p.count)).encode('utf-8')
+            # print the content of the slots
+            for (i,(is_var, s)) in enumerate(p.slots):
+                print ('%s: %s' % (pr(i, is_var)," ".join(s))).encode('utf-8')
+            print
+    else:
+            print 'Usage: <program> [-p|-s] <paradigm_file>'
+
+
