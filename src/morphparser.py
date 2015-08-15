@@ -1,9 +1,35 @@
+# Do morphological analysis based on learned paradigms
+# Reads one or more whitespace-separated words from STDIN and
+# returns the most plausible analysis for the set in the format:
+# SCORE  NAME_OF_PARADIGM  VARIABLES  WORDFORM1:BASEFORM,MSD#WORDFORM2:BASEFORM,MSD...
+
+# Flags:
+# -k num   print the k best analyses
+# -t       print the entire table for the best analysis
+# -d       print debug info
+# -n num   use an nth order ngram model for selecting best paradigm
+#          (an n-gram model for variables in the paradigm is used)
+
+# Example:
+# echo "coger cojo" | python morphparser.py ./../paradigms/spanish_verbs.p -k 1 -t
+#
+# Output:
+
+# -11.231539838 coger (1=co) coger:coger,type=infinitive#cojo:coger,person=1st,number=singular,tense=present,mood=indicative
+# *coger*	type=infinitive
+# cogiendo	type=participle,tense=present
+# cogido	type=participle,tense=past
+# *cojo*	person=1st,number=singular,tense=present,mood=indicative
+# coges	person=2nd,number=singular,tense=present,mood=indicative
+# coge	person=3rd,number=singular,tense=present,mood=indicative
+# ...
+
 import sys, math, paradigm, codecs, getopt
 
 class stringngram:
 
     def __init__(self, stringset, alphabet = None, order = 2, ngramprior = 0.01):
-        """Read a set of strings and create a n-gram model."""
+        """Read a set of strings and create an n-gram model."""
         self.stringset = [u'#'*(order-1) + s + u'#' for s in stringset]
         self.alphabet = {char for s in self.stringset for char in s}
         self.order = order
@@ -41,13 +67,30 @@ def paradigms_to_alphabet(paradigms):
                     alphabet |= set(word)
     return alphabet - {'_'}
 
+def eval_vars(matches, lm):
+    return sum(lm[1][midx].evaluate(m) for midx, m in enumerate(matches))
 
+def eval_multiple_entries(p, words):
+    """Returns a set of consistent variable assigment to all words."""
+    wmatches = []
+    for w in words:
+        wmatch = set()
+        for m in filter(lambda x: x != None, p.match(w, constrained = False)):
+            if m == []:
+                m = [(0,())] # Add dummy to show match is exact without vars
+            for submatch in m:
+                if len(submatch) > 0:
+                    wmatch.add(submatch[1])
+        wmatches.append(wmatch)
+    consistentvars = reduce(lambda x,y: x & y, wmatches)
+    return consistentvars
 
+    
 def main(argv):
 
-    options, remainder = getopt.gnu_getopt(argv[1:], 'tk:n:p:', ['tables','kbest','ngram','prior'])
+    options, remainder = getopt.gnu_getopt(argv[1:], 'tk:n:p:d', ['tables','kbest','ngram','prior','debug'])
 
-    print_tables, kbest, ngramorder, ngramprior = False, 1, 3, 0.01
+    print_tables, kbest, ngramorder, ngramprior, debug = False, 1, 3, 0.01, False
     for opt, arg in options:
         if opt in ('-t', '--tables'):
             print_tables = True
@@ -57,6 +100,8 @@ def main(argv):
             ngramorder = int(arg)
         elif opt in ('-p', '--prior'):
             ngramprior = float(arg)
+        elif opt in ('-d', '--debug'):
+            debug = True
 
                
     paradigms = paradigm.load_file(sys.argv[1]) # [(occurrence_count, name, paradigm),...,]
@@ -65,6 +110,7 @@ def main(argv):
     numexamples = sum(map(lambda x: x.count, paradigms))
 
     lms = []
+    # Learn n-gram LM for each variable
     for pindex, p in enumerate(paradigms):
         numvars = (len(p.slots) - 1)/2
         slotmodels  = []
@@ -74,50 +120,57 @@ def main(argv):
             slotmodels.append(model)
         lms.append((numvars, slotmodels))
 
-    def eval_vars(matches, lm):
-        matchpossibilities = [matches[z] for z in range(1,len(matches),2)] # get every other element
-        #print "MPOSS", matchpossibilities
-        maxscore = -1000000
-        for mp in matchpossibilities:
-            #print "MP", mp
-            score = 0
-            for midx, m in enumerate(mp):
-                score += lm[1][midx].evaluate(m)
-            if score > maxscore:
-                maxscore = score
-        return maxscore
-
-
+            
     for line in iter(lambda: sys.stdin.readline().decode('utf-8'), ''):
-        word = line.strip()
+        words = line.strip().split()
+        if len(words) == 0:
+            continue
+        
+        # Quick filter out most paradigms
+        fittingparadigms = [(pindex, p) for pindex, p in enumerate(paradigms) if all(p.fits_paradigm(w, constrained = False) for w in words)]
+        fittingparadigms = filter(lambda p: eval_multiple_entries(p[1], words), fittingparadigms)
+        
+        if debug:
+            print "Plausible paradigms:"
+            for pnum, p in fittingparadigms:
+                print pnum, p.name
+
         analyses = []
-        for pindex, p in enumerate(paradigms):
-            for f in p.forms:
-                matching = f.match_vars(word, constrained = False)
-                # [(2, ('v', 'enc')), (2, ('ve', 'nc')), (2, ('ven', 'c'))]
-                if matching != None:
-                    if len(matching) == 0:
-                        score = 0
-                        analyses.append((p, score, p.name, (len(word), ()), f.msd))
-                    else:
-                        for m in matching:
-                            #score = math.log(p.count/float(numexamples)) + eval_vars(m, lms[pindex])
-                            score = eval_vars(m, lms[pindex])
-                            analyses.append((p, score, p.name, m, f.msd))
+        # Calculate score for each possible variable assignment
+        for pindex, p in fittingparadigms:
+            prior = math.log(p.count/float(numexamples))
+            vars = eval_multiple_entries(p, words) # All possible instantiations
+            if len(vars) == 0:
+                # Word matches
+                score = prior
+                analyses.append((score, p, ()))
+            else:
+                for v in vars:
+                    score = prior + len(words) * eval_vars(v, lms[pindex])
+                    analyses.append((score, p, v))
 
-        sortedanalyses = sorted(analyses, key = lambda a: a[1], reverse = True)
+        analyses.sort(reverse = True, key = lambda x: x[0])
 
-        for n in xrange(min(len(sortedanalyses), kbest)):
-            msdprint = ','.join([m[0] + '=' + m[1] for m in sortedanalyses[n][4]])
-            pout = [str(sortedanalyses[n][1]), sortedanalyses[n][2], str(sortedanalyses[n][3][0]) + ':' + ','.join(sortedanalyses[n][3][1]), msdprint]
-            print ('\t'.join(pout)).encode('utf-8')
+        # Print all analyses + optionally a table        
+        for aindex, (score, p, v) in enumerate(analyses):
+            if aindex >= kbest:
+                break
+            wordformlist = []
+            varstring = '(' + ','.join([str(feat) + '=' + val for feat,val in zip(range(1,len(v)+1), v)]) + ')'
+            table = p(*v)          # Instantiate table with vars from analysis
+            baseform = table[0][0]
+            matchtable = [(form, msd) for form, msd in table if form in words]
+            wordformlist = [form +':' + baseform + ',' + ','.join([m[0] + '=' + m[1] for m in msd]) for form, msd in matchtable]                    
+            print (unicode(score) + ' ' + p.name + ' ' + varstring + ' ' + '#'.join(wordformlist)).encode("utf-8")
             if print_tables:
-                # Instantiate table
-                table = sortedanalyses[n][0](*sortedanalyses[n][3][1])
                 for form, msd in table:
+                    if form in words:
+                        form = "*" + form + "*"
                     msdprint = ','.join([m[0] + '=' + m[1] for m in msd])
                     print (form + '\t' + msdprint).encode("utf-8")
+
         print
+                    
 
 if __name__ == "__main__":
     main(sys.argv)
