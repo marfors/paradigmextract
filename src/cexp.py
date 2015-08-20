@@ -27,6 +27,8 @@ ds = read_data(sys.argv[2])
 
 exp = []
 
+total_number_of_words = float(sum([p.count for p in ps]))
+
 for t in ds:
     w_result = (t[0],[])
     for p in ps:
@@ -37,7 +39,7 @@ for t in ds:
                 for (sc,bs) in bf_match[::-1]:
                     tlen = len(t)
                     correct = len([(w1,w2) for (w1,w2) in zip([w for (w,_) in p(*bs)],t) if w1 == w2])
-                    w_result[1].append((sc, p.count, p.name, var_annot(bs), 100*float(correct)/tlen))
+                    w_result[1].append((sc, p.count/total_number_of_words, p.name, var_annot(bs), 100*float(correct)/tlen))
     w_result[1].sort(key=lambda res:(res[0],res[1]), reverse=True)
     if len(w_result[1]) > 0:
         acc = w_result[1][0][4]
@@ -55,13 +57,13 @@ for (acc,w_result) in exp:
         tot += 1
         form += acc
         found_paradigm = '   PARADIGM NOT FOUND\n'
-        print ('%s\n   %.2f%s\t%s\t%s\t%d\t%d' % (w_result[0], acc,'%', w_result[1][0][2], w_result[1][0][3], w_result[1][0][0], w_result[1][0][1])).encode('utf-8')
+        print ('%s\n   %.2f%s\t%s\t%s\t%d\t%d (%.2f%s)' % (w_result[0], acc,'%', w_result[1][0][2], w_result[1][0][3], w_result[1][0][0], w_result[1][0][1]*total_number_of_words,  w_result[1][0][1]*100,'%')).encode('utf-8')
         if int(acc) == 100:
                 table += 1
                 found_paradigm = ''
         else:
                 for res in w_result[1][1:]:
-                        print ('   %.2f%s\t%s\t%s\t%d\t%d' % (res[4],'%', res[2], res[3], res[0], res[1])).encode('utf-8')
+                        print ('   %.2f%s\t%s\t%s\t%d\t%d (%.2f%s)' % (res[4],'%', res[2], res[3], res[0], res[1]*total_number_of_words, res[1]*100,'%')).encode('utf-8')
                         if int(res[4]) == 100:
                                 found_paradigm = ''
                                 break
