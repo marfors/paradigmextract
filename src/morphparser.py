@@ -88,9 +88,9 @@ def eval_multiple_entries(p, words):
     
 def main(argv):
 
-    options, remainder = getopt.gnu_getopt(argv[1:], 'tk:n:p:d', ['tables','kbest','ngram','prior','debug'])
+    options, remainder = getopt.gnu_getopt(argv[1:], 'tk:n:p:dr:', ['tables','kbest','ngram','prior','debug','pprior'])
 
-    print_tables, kbest, ngramorder, ngramprior, debug = False, 1, 3, 0.01, False
+    print_tables, kbest, ngramorder, ngramprior, debug, pprior = False, 1, 3, 0.01, False, 1.0
     for opt, arg in options:
         if opt in ('-t', '--tables'):
             print_tables = True
@@ -102,7 +102,10 @@ def main(argv):
             ngramprior = float(arg)
         elif opt in ('-d', '--debug'):
             debug = True
-
+        elif opt in ('-d', '--debug'):
+            debug = True
+        elif opt in ('-r', '--pprior'):
+            pprior = float(arg)
                
     paradigms = paradigm.load_file(sys.argv[1]) # [(occurrence_count, name, paradigm),...,]
     alphabet = paradigms_to_alphabet(paradigms)
@@ -146,7 +149,8 @@ def main(argv):
                 analyses.append((score, p, ()))
             else:
                 for v in vars:
-                    score = prior + len(words) * eval_vars(v, lms[pindex])
+                    score = prior * pprior + len(words) * eval_vars(v, lms[pindex])
+                    #score = len(words) * eval_vars(v, lms[pindex])
                     analyses.append((score, p, v))
 
         analyses.sort(reverse = True, key = lambda x: x[0])
