@@ -7,7 +7,7 @@ from collections import defaultdict
 
 def processes(models):
     ps = []
-    for m in models:        
+    for m in models: # a model file ends with train_dev.foma.bin
         c = 'flookup -b -i -a ' + m
         proc = subprocess.Popen(c, shell=True,
                                 stdin=subprocess.PIPE,
@@ -19,12 +19,12 @@ def analyze(w, ps):
     out = set()
     for p in ps:
         p.stdin.write(w.encode('utf-8')+'\n')
-        while True:
+        while True: # collect all FST analyses
             o = p.stdout.readline().decode('utf-8').strip()
             if len(o) > 0:
-                if out != '+?':
+                if out != '+?': # +? = no analysis
                     out.add(o.split('\t')[1])
-            else:
+            else: # blank line = no more analyses 
                 break
     return out
 
@@ -39,9 +39,9 @@ def read_data(fs):
                 if len(s) > 0:
                     (w,msd) = s.split('\t')
                     if new_lemma:
-                        (lemma,new_lemma) = (w,False)
-                    d[w].add('%s[%s]' % (lemma,msd.replace(',', ' ')))
-                else:
+                        (lemma,new_lemma) = (w,False) # first form in a table
+                    d[w].add('%s[%s]' % (lemma,msd.replace(',', ' '))) # convert to FST format
+                else: # a blank line separates the tables
                     new_lemma = True
     return d
 
@@ -60,6 +60,7 @@ def exp(lang):
     return result
 
 def pr_diff(diff):
+    # print a compact representation of the missed lemma+msd pairs.
     ss = []
     d = defaultdict(set)
     for x in diff:
@@ -70,7 +71,6 @@ def pr_diff(diff):
         ss.append('%s+{%s}' % (l,", ".join(msd)))
     return ", ".join(ss)
     
-
 if __name__ == '__main__':
     lang = sys.argv[1]
     result = exp(lang)
