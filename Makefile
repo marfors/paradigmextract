@@ -1,4 +1,19 @@
 PYTHONPATH=$PYTHONPATH:./src
+exp:
+	cd src; python mexp.py de > ../output/de_morph.txt
+	cd src; python mexp.py de_noun > ../output/de_noun_morph.txt
+	cd src; python mexp.py de_verb > ../output/de_verb_morph.txt
+	cd src; python mexp.py es > ../output/es_morph.txt
+	cd src; python mexp.py fi > ../output/fi_morph.txt
+	cd src; python mexp.py fi_noun > ../output/fi_noun_morph.txt
+	cd src; python mexp.py fi_verb > ../output/fi_verb_morph.txt
+
+slots:
+	cd src; python paradigm.py -s ../paradigms/german_nouns.p > ../output/german_nouns_slots.txt
+	cd src; python paradigm.py -s ../paradigms/german_verbs.p > ../output/german_verbs_slots.txt
+	cd src; python paradigm.py -s ../paradigms/finnish_nounadj.p > ../output/finnish_nounadj_slots.txt
+	cd src; python paradigm.py -s ../paradigms/finnish_verbs.p > ../output/finnish_verbs_slots.txt
+	cd src; python paradigm.py -s ../paradigms/spanish_verbs.p > ../output/spanish_verbs_slots.txt
 
 .PRECIOUS: morph/%.foma morph/%.foma.bin
 
