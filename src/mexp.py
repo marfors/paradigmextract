@@ -85,4 +85,5 @@ if __name__ == '__main__':
     sd = '    M/D: %.2f' % (float(mcount)/total)
     sys.stderr.write('\n    lang: %s\n'%lang+recall+'\n')
     sys.stderr.write('    unique wfs: %d' % (wcount) + '\n')
+    sys.stderr.write('    avg ambiguity: %.2f' % (float(total)/wcount) + '\n')
     sys.stderr.write(sd+'\n\n')
