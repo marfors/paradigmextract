@@ -57,7 +57,7 @@ def exp(lang):
         ls2 = set([x.split('[')[0] for x in mas])
         common = xs.intersection(mas)
         diff = xs.difference(mas)
-        result.append((len(diff), (ls1, ls2),(w,mas,xs,common,diff)))
+        result.append((len(diff),(w,ls1,ls2,mas,xs,common,diff)))
     result.sort(reverse=True)
     return result
 
@@ -76,18 +76,24 @@ def pr_diff(diff):
 if __name__ == '__main__':
     lang = sys.argv[1]
     result = exp(lang)
-    (wcount, total,correct,mcount,l1count,l2count) = (0,0,0,0,0,0)
-    for (dl,(l1,l2), (w,mas,xs,common,diff)) in result:
+    (wcount, total,correct,mcount,l1count,l2count,lcorrect) = (0,0,0,0,0,0,0)
+    for (dl, (w,l1,l2,mas,xs,common,diff)) in result:
         wcount += 1
         total += len(xs)
         correct += len(common)
         mcount += len(mas)
         l1count += len(l1)
+        lcorrect += len(l1.intersection(l2))
         l2count += len(l2)
         print ('%s\t missing:%d (d:%d m:%d)\t%s' % (w,dl,len(xs), len(mas), pr_diff(diff))).encode('utf-8')
-    recall = '    recall: %.2f%s (%d of %d lemma+msd)' % (100*float(correct)/total,'%', correct, total)
-    sys.stderr.write('\n    lang: %s\n'%lang+recall+'\n')
+
+
+    sys.stderr.write('\n    lang: %s\n'%lang)
     sys.stderr.write('    unique wfs: %d' % (wcount) + '\n')
-    sys.stderr.write('    avg ambiguity in data: %.2f' % (float(total)/wcount) + '\n')
-    sys.stderr.write('    avg lemma/wf: %.2f' % (float(l2count)/wcount) + '\n')
-    sys.stderr.write('    avg lemma+msd/wf: %.2f' % (float(mcount)/wcount)+'\n\n')
+    sys.stderr.write('    ambiguity: %.2f' % (float(total)/wcount) + '\n\n')
+    lrecall = '    L-recall: %.2f%s (%d of %d)' % (100*float(lcorrect)/l1count,'%', lcorrect, l1count)
+    lmrecall = '    L+MSD-recall: %.2f%s (%d of %d)' % (100*float(correct)/total,'%', correct, total)    
+    sys.stderr.write(lrecall+'\n')
+    sys.stderr.write(lmrecall+'\n')
+    sys.stderr.write('    L/W: %.2f' % (float(l2count)/wcount) + '\n')
+    sys.stderr.write('    L+MSD/W: %.2f' % (float(mcount)/wcount)+'\n\n')
