@@ -25,7 +25,7 @@ morph/%.foma.bin: morph/%.foma
 morph/%.foma: paradigms/%.p
 	mkdir -p morph ; python src/morphanalyzer.py -o -c -u -s -n $(notdir $@.bin) $< > $@
 holes:
-	cd src; python hole.py de_noun
+	cd src; python hole.py
 clean:
 	rm -f morph/*.foma morph/*.bin
 

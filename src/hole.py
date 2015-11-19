@@ -34,11 +34,10 @@ def read_tables(file):
     return tables
 
 if __name__ == '__main__':
-    lang = sys.argv[1]
-    for f in glob.glob('../data/' + lang + '*test.txt'):
-        for (_,t) in read_tables(f):
-            for (w,msd) in t:
-                print '%s\t%s' % (w,msd)
-            print
-
-        
+    for f in glob.glob('../data/*.txt'):
+        if '_h_' not in f:
+            with codecs.open(f[::-1].replace('_','_h_',1)[::-1], encoding='utf-8', mode='w') as fout:
+                for (_,t) in read_tables(f):
+                    for (w,msd) in t:
+                        fout.write('%s\t%s\n' % (w,msd))
+                    fout.write('\n')
