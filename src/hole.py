@@ -10,7 +10,7 @@ random.seed(SEED)
 def create_holes(l,t):
     num_of_holes = int(round(random.normalvariate(len(t)/2.0, len(t)/4.0)))
     num_of_holes = max(1, min(len(t)-1, num_of_holes))
-    for i in random.sample(xrange(0,len(t)), num_of_holes):
+    for i in random.sample(xrange(1,len(t)), num_of_holes):
         t[i] = ('@%s' % l,t[i][1])
     return (l,t)
     
