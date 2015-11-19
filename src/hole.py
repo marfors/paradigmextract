@@ -33,10 +33,14 @@ def read_tables(file):
                 table = []
     return tables
 
+def hole_filename(f):
+    xs = f.split('_')
+    return "_".join([xs[0],xs[1],'h'] + xs[2:])
+    
 if __name__ == '__main__':
     for f in glob.glob('../data/*.txt'):
         if '_h_' not in f:
-            with codecs.open(f[::-1].replace('_','_h_',1)[::-1], encoding='utf-8', mode='w') as fout:
+            with codecs.open(hole_filename(f), encoding='utf-8', mode='w') as fout:
                 for (_,t) in read_tables(f):
                     for (w,msd) in t:
                         fout.write('%s\t%s\n' % (w,msd))
