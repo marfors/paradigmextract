@@ -6,7 +6,7 @@ import paradigm
 
 def pr_form(f):
     if f[0] == '@':
-        return '@'*len(f)
+        return '@'
     else:
         return f
 
@@ -15,6 +15,16 @@ def compatible(fs1,fs2):
         if f1 != f2 and f1[0] != '@' and f2[0] != '@':
             return False 
     return True
+
+def class_paradigm(c):
+    cforms = []
+    for xs in zip(*[fs for (fs,_) in c]):        
+        for x in xs:
+            f = x
+            if f[0] != '@':
+                break
+        cforms.append(f)
+    return cforms
 
 def compatibility_classes(ps):
     c_classes = []
@@ -43,12 +53,13 @@ if __name__ == '__main__':
                 ambi[n].append(i)
     
         for (i,c) in enumerate(compat_cs,1):
-            print 'Class %d' % i
+            print '\nClass %d' % i 
             for (fs,n) in sorted(c):
                 if len(ambi[n]) > 1:
                     print ('    %s\t[%s:%d]' % (' '.join(fs), n,len(ambi[n]))).encode('utf-8')
                 else:
                     print ('    %s\t%s' % (' '.join(fs), n)).encode('utf-8')
+            print (' => %s' % (' '.join(class_paradigm(c)))).encode('utf-8')
         print '\n  hole_pcount: %d\n  org_pcount: %d\n  merged_pcount: %d\n  ambi_count: %d' % (len(phs),len(ps), i, len([xs for (_,xs) in ambi.iteritems() if len(xs) > 1]))
     except:
         print 'usage: python compat.py ph_file p_file'
