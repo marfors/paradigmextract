@@ -42,9 +42,9 @@ if __name__ == '__main__':
                 ambi[n].append(i)
             for (fs,n) in c:
                 if len(ambi[n]) > 1:
-                    print '    %s\t[%s:%d]' % (' '.join(fs), n,len(ambi[n]))
+                    print ('    %s\t[%s:%d]' % (' '.join(fs), n,len(ambi[n]))).encode('utf-8')
                 else:
-                    print '    %s\t%s' % (' '.join(fs), n)
+                    print ('    %s\t%s' % (' '.join(fs), n)).encode('utf-8')
         print '\n  hole_pcount: %d\n  org_pcount: %d\n  merged_pcount: %d\n  ambi_count: %d' % (len(phs),len(ps), i, len([xs for (_,xs) in ambi.iteritems() if len(xs) > 1]))
     except:
         print 'usage: python compat.py ph_file p_file'
