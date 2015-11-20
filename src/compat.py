@@ -36,11 +36,15 @@ if __name__ == '__main__':
         phs = paradigm.load_file(sys.argv[1])
         ps  = paradigm.load_file(sys.argv[2])
         ambi = defaultdict(list)
-        for (i,c) in enumerate(compatibility_classes(phs),1):
-            print 'Class %d' % i
+        compat_cs = compatibility_classes(phs)
+        
+        for (i,c) in enumerate(compat_cs,1): # compute ambiguity
             for (fs,n) in c:
                 ambi[n].append(i)
-            for (fs,n) in c:
+    
+        for (i,c) in enumerate(compat_cs,1):
+            print 'Class %d' % i
+            for (fs,n) in sorted(c):
                 if len(ambi[n]) > 1:
                     print ('    %s\t[%s:%d]' % (' '.join(fs), n,len(ambi[n]))).encode('utf-8')
                 else:
