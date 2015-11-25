@@ -31,6 +31,8 @@ htest:
 	python src/paradigm.py -p paradigms/de_noun_h_train_dev.p
 compat:
 	python src/compat.py paradigms/de_noun_h_train_dev.p paradigms/de_noun_train_dev.p
+shared:
+	python src/convert_shared_data.py
 clean:
 	rm -f morph/*.foma morph/*.bin
 
