@@ -4,9 +4,22 @@ import sys
 from collections import defaultdict
 
 if __name__ == '__main__':
-    data = {}
-    for filename in glob.glob('data/shared_task_data/splits/*task1-train'):
+    for filename in glob.glob('data/shared_task_data/splits/german-task1-train'):
+        data = defaultdict(dict)
+        msds = defaultdict(set)
+        
         with codecs.open(filename, encoding='utf-8') as f:
-            data[filename.split('/')[-1]] = [tuple(l.split('\t')) for l in f.read().split('\n')[1:] if len(l) > 0]
-            # (u'd\xfcld\xfcl', u'pos=N,case=DAT,num=PL', u'd\xfcld\xfcllere')
-    print data
+            for (l,msd,wf) in [l.split('\t') for l in f.read().split('\n')[1:] if len(l) > 0]:
+                pos = msd.split(',')[0].split('=')[1]
+                msd = ",".join(msd.split(',')[1:])
+                data[(l,pos)][msd] = wf
+                msds[pos].add(msd)
+        for ((l,pos),d) in data.iteritems():
+         if pos == 'V':
+            print ('%s\tBF' % l).encode('utf-8')
+            for m in msds[pos]:
+                if m in d:
+                    print ('%s\t%s' % (d[m],m)).encode('utf-8')
+                else:
+                    print ('@%s\t%s' % (l,m)).encode('utf-8')
+            print

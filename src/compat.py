@@ -68,7 +68,7 @@ class PClasses:
             self.cforms.append(f)
         return self.cforms
     
-    def pr_info(self,cs,ps):
+    def pr_info(self,cs):
         
         ambi = defaultdict(list)
         for (i,c) in enumerate(cs,1): # compute ambiguity
@@ -86,14 +86,13 @@ class PClasses:
             print (' => %s' % (' '.join(phs.class_paradigm(c)))).encode('utf-8')
 
         # print some stats.
-        print '\n  hole_pcount: %d\n  org_pcount: %d\n  merged_pcount: %d\n  ambi_count: %d' % (len(phs.ptable),len(ps), i, len([xs for (_,xs) in ambi.iteritems() if len(xs) > 1]))
+        print '\n  hole_pcount: %d\n  merged_pcount: %d\n  ambi_count: %d' % (len(phs.ptable), i, len([xs for (_,xs) in ambi.iteritems() if len(xs) > 1]))
 
         
 if __name__ == '__main__':
     try:
         phs = PClasses(sys.argv[1]) # paradigms with holes
-        ps  = paradigm.load_file(sys.argv[2]) # paradigms without holes as reference
         cs  = phs.paradigm_classes(phs) # compute paradigm classes
-        phs.pr_info(cs,ps)
+        phs.pr_info(cs)
     except:
         print 'usage: python compat.py ph_file p_file'
