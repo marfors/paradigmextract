@@ -36,6 +36,10 @@ shared:
 	python src/convert_shared_data.py german-task1-train N > data/shared_de_noun_train.txt
 	python src/convert_shared_data.py german-task1-train V > data/shared_de_verb_train.txt
 	python src/convert_shared_data.py german-task1-train ADJ > data/shared_de_adj_train.txt
+
+	python src/convert_shared_data.py russian-task1-train N > data/shared_ru_noun_train.txt
+	python src/convert_shared_data.py russian-task1-train V > data/shared_ru_verb_train.txt
+	python src/convert_shared_data.py russian-task1-train ADJ > data/shared_ru_adj_train.txt
 clean:
 	rm -f morph/*.foma morph/*.bin
 
