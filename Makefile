@@ -33,7 +33,9 @@ compat:
 	python src/compat.py paradigms/shared-german-task1-verb-train.p
 	#python src/compat.py paradigms/de_noun_h_train_dev.p
 shared:
-	python src/convert_shared_data.py german-task1-train N
+	python src/convert_shared_data.py german-task1-train N > data/shared_de_noun_train.txt
+	python src/convert_shared_data.py german-task1-train V > data/shared_de_verb_train.txt
+	python src/convert_shared_data.py german-task1-train ADJ > data/shared_de_adj_train.txt
 clean:
 	rm -f morph/*.foma morph/*.bin
 
