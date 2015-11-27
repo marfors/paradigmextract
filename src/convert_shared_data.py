@@ -4,7 +4,7 @@ import sys
 from collections import defaultdict
 
 if __name__ == '__main__':
-    for filename in glob.glob('data/shared_task_data/splits/german-task1-train'):
+    for filename in glob.glob('data/shared_task_data/splits/' + sys.argv[1]):
         data = defaultdict(dict)
         msds = defaultdict(set)
         
@@ -15,7 +15,7 @@ if __name__ == '__main__':
                 data[(l,pos)][msd] = wf
                 msds[pos].add(msd)
         for ((l,pos),d) in data.iteritems():
-         if pos == 'V':
+         if pos == sys.argv[2]:
             print ('%s\tBF' % l).encode('utf-8')
             for m in msds[pos]:
                 if m in d:
