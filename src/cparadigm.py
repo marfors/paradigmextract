@@ -4,13 +4,17 @@ import sys
 from collections import defaultdict
 import paradigm
 
+# Notes:
+# - read paradigm file, output class paradigm file.
+# in __init__ : we need to keep all information.
+
 class PClasses:
 
     """A class for representing abstractions over incomplete paradigms, i.e., paradigm classes"""
     
     def __init__(self, pfile):
         # (pname, paradigm forms)
-        self.ptable = dict([(p.name, [self._convert_holes('+'.join(f.form)) for f in p.forms])
+        self.ptable = dict([(p.name, ([self._convert_holes('+'.join(f.form)) for f in p.forms],p) )
                                                       for p in paradigm.load_file(pfile)])
         # compatibility adjacency graph
         self.compat_graph = self._build_compat_graph()
@@ -33,7 +37,7 @@ class PClasses:
         for pid1 in self.ptable:
             for pid2 in self.ptable:
                 if pid1 != pid2:
-                    if self._compatible(self.ptable[pid1], self.ptable[pid2]):
+                    if self._compatible(self.ptable[pid1][0], self.ptable[pid2][0]):
                         compat_graph[pid1].add(pid2)
         return compat_graph
 
@@ -60,7 +64,7 @@ class PClasses:
     def class_paradigm(self,c):
         # derive the class paradigm from the members of the class.
         self.cforms = []
-        for xs in zip(*[self.ptable[n] for n in c]):        
+        for xs in zip(*[self.ptable[n][0] for n in c]):        
             for x in xs:
                 f = x
                 if f[0] != '@': # instantiation found.
@@ -78,21 +82,32 @@ class PClasses:
         for (i,c) in enumerate(cs,1): # print paradigm classes
             print '\nClass %d' % i 
             for n in c:
-                fs = phs.paradigm(n) 
+                fs = self.paradigm(n)[0] 
                 if len(ambi[n]) > 1:
                     print ('    %s\t[%s:%d]' % (' '.join(fs), n,len(ambi[n]))).encode('utf-8')
                 else:
                     print ('    %s\t%s' % (' '.join(fs), n)).encode('utf-8')
-            print (' => %s' % (' '.join(phs.class_paradigm(c)))).encode('utf-8')
-
+            print (' => %s' % (' '.join(self.class_paradigm(c)))).encode('utf-8')
         # print some stats.
-        print '\n  hole_pcount: %d\n  merged_pcount: %d\n  ambi_count: %d' % (len(phs.ptable), i, len([xs for (_,xs) in ambi.iteritems() if len(xs) > 1]))
+        print '\n  hole_pcount: %d\n  merged_pcount: %d\n  ambi_count: %d' % (len(self.ptable), i, len([xs for (_,xs) in ambi.iteritems() if len(xs) > 1]))
 
+    def pr_cparadigms(self,pclasses):
+        for pclass in pclasses: #
+            fs = self.class_paradigm(pclass) # TODO: add msd
+            for p_name in pclass: # TODO: merge paradigms in class
+                (_,p) = phs.paradigm(p_name)
+                print p
+            # TODO: print class paradigm
         
 if __name__ == '__main__':
-    try:
-        phs = PClasses(sys.argv[1]) # paradigms with holes
+   # try:
+        phs = PClasses(sys.argv[2]) # paradigms with holes
         cs  = phs.paradigm_classes(phs) # compute paradigm classes
-        phs.pr_info(cs)
-    except:
-        print 'usage: python compat.py ph_file p_file'
+        if sys.argv[1] == '-i':
+            phs.pr_info(cs)
+        elif sys.argv[1] == '-c':
+            phs.pr_cparadigms(cs)
+        else:
+            print 'usage: python cparadigm.py [-i|-c] ph_file'
+   # except:
+        print 'usage: python cparadigm.py [-i|-c] ph_file'

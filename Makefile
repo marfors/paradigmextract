@@ -29,9 +29,10 @@ holes:
 htest:
 	python src/pextract.py < data/de_noun_h_train_dev.txt > paradigms/de_noun_h_train_dev.p
 	python src/paradigm.py -p paradigms/de_noun_h_train_dev.p
-compat:
-	python src/compat.py paradigms/shared1_ar_verb_train.p
-	#python src/compat.py paradigms/de_noun_h_train_dev.p
+cparadigm:
+	python src/cparadigm.py -c paradigms/shared1_de_noun_train.p
+cparadigmi:
+	python src/cparadigm.py -i paradigms/shared1_de_noun_train.p
 shared:
 	python src/convert_shared_data.py data/sigmorphon2016/data/arabic-task1-train V   > data/shared1_ar_verb_train.txt
 	python src/convert_shared_data.py data/sigmorphon2016/data/arabic-task1-train N   > data/shared1_ar_noun_train.txt
