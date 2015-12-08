@@ -30,16 +30,70 @@ htest:
 	python src/pextract.py < data/de_noun_h_train_dev.txt > paradigms/de_noun_h_train_dev.p
 	python src/paradigm.py -p paradigms/de_noun_h_train_dev.p
 compat:
-	python src/compat.py paradigms/shared-german-task1-verb-train.p
+	python src/compat.py paradigms/shared1_ar_verb_train.p
 	#python src/compat.py paradigms/de_noun_h_train_dev.p
 shared:
-	python src/convert_shared_data.py german-task1-train N > data/shared_de_noun_train.txt
-	python src/convert_shared_data.py german-task1-train V > data/shared_de_verb_train.txt
-	python src/convert_shared_data.py german-task1-train ADJ > data/shared_de_adj_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/arabic-task1-train V   > data/shared1_ar_verb_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/arabic-task1-train N   > data/shared1_ar_noun_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/arabic-task1-train ADJ > data/shared1_ar_adj_train.txt
 
-	python src/convert_shared_data.py russian-task1-train N > data/shared_ru_noun_train.txt
-	python src/convert_shared_data.py russian-task1-train V > data/shared_ru_verb_train.txt
-	python src/convert_shared_data.py russian-task1-train ADJ > data/shared_ru_adj_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/georgian-task1-train V   > data/shared1_ka_verb_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/georgian-task1-train N   > data/shared1_ka_noun_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/georgian-task1-train ADJ > data/shared1_ka_adj_train.txt
+
+	python src/convert_shared_data.py data/sigmorphon2016/data/navajo-task1-train V   > data/shared1_nv_verb_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/navajo-task1-train N   > data/shared1_nv_noun_train.txt
+
+	python src/convert_shared_data.py data/sigmorphon2016/data/spanish-task1-train V   > data/shared1_es_verb_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/spanish-task1-train N   > data/shared1_es_noun_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/spanish-task1-train ADJ > data/shared1_es_adj_train.txt
+
+	python src/convert_shared_data.py data/sigmorphon2016/data/finnish-task1-train V   > data/shared1_fi_verb_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/finnish-task1-train N   > data/shared1_fi_noun_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/finnish-task1-train ADJ > data/shared1_fi_adj_train.txt
+
+	python src/convert_shared_data.py data/sigmorphon2016/data/german-task1-train V   > data/shared1_de_verb_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/german-task1-train N   > data/shared1_de_noun_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/german-task1-train ADJ > data/shared1_de_adj_train.txt
+
+	python src/convert_shared_data.py data/sigmorphon2016/data/russian-task1-train V   > data/shared1_ru_verb_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/russian-task1-train N   > data/shared1_ru_noun_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/russian-task1-train ADJ > data/shared1_ru_adj_train.txt
+
+	python src/convert_shared_data.py data/sigmorphon2016/data/turkish-task1-train V   > data/shared1_tr_verb_train.txt
+	python src/convert_shared_data.py data/sigmorphon2016/data/turkish-task1-train N   > data/shared1_tr_noun_train.txt
+
+pshared:
+	python src/pextract.py < data/shared1_ar_verb_train.txt > paradigms/shared1_ar_verb_train.p 
+	python src/pextract.py < data/shared1_ar_noun_train.txt > paradigms/shared1_ar_noun_train.p 
+	python src/pextract.py < data/shared1_ar_adj_train.txt > paradigms/shared1_ar_adj_train.p 
+
+	python src/pextract.py < data/shared1_ka_verb_train.txt > paradigms/shared1_ka_verb_train.p 
+	python src/pextract.py < data/shared1_ka_noun_train.txt > paradigms/shared1_ka_noun_train.p 
+	python src/pextract.py < data/shared1_ka_adj_train.txt > paradigms/shared1_ka_adj_train.p 
+
+	python src/pextract.py < data/shared1_nv_verb_train.txt > paradigms/shared1_nv_verb_train.p 
+	python src/pextract.py < data/shared1_nv_noun_train.txt > paradigms/shared1_nv_noun_train.p 
+
+	python src/pextract.py < data/shared1_es_verb_train.txt > paradigms/shared1_es_verb_train.p 
+	python src/pextract.py < data/shared1_es_noun_train.txt > paradigms/shared1_es_noun_train.p 
+	python src/pextract.py < data/shared1_es_adj_train.txt > paradigms/shared1_es_adj_train.p 
+
+	python src/pextract.py < data/shared1_fi_verb_train.txt > paradigms/shared1_fi_verb_train.p 
+	python src/pextract.py < data/shared1_fi_noun_train.txt > paradigms/shared1_fi_noun_train.p 
+	python src/pextract.py < data/shared1_fi_adj_train.txt > paradigms/shared1_fi_adj_train.p 
+
+	python src/pextract.py < data/shared1_de_verb_train.txt > paradigms/shared1_de_verb_train.p 
+	python src/pextract.py < data/shared1_de_noun_train.txt > paradigms/shared1_de_noun_train.p 
+	python src/pextract.py < data/shared1_de_adj_train.txt > paradigms/shared1_de_adj_train.p 
+
+	python src/pextract.py < data/shared1_ru_verb_train.txt > paradigms/shared1_ru_verb_train.p
+	python src/pextract.py < data/shared1_ru_noun_train.txt > paradigms/shared1_ru_noun_train.p
+	python src/pextract.py < data/shared1_ru_adj_train.txt > paradigms/shared1_ru_adj_train.p
+
+	python src/pextract.py < data/shared1_tr_verb_train.txt > paradigms/shared1_tr_verb_train.p
+	python src/pextract.py < data/shared1_tr_noun_train.txt > paradigms/shared1_tr_noun_train.p
+
 clean:
 	rm -f morph/*.foma morph/*.bin
 
