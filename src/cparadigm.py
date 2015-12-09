@@ -14,15 +14,15 @@ class PClasses:
     
     def __init__(self, pfile):
         # (pname, paradigm forms)
-        self.ptable = dict([(p.name, ([self._convert_holes('+'.join(f.form)) for f in p.forms],p) )
+        self.ptable = dict([(p.name, (['+'.join(f.form) for f in p.forms],p) )
                                                       for p in paradigm.load_file(pfile)])
         # compatibility adjacency graph
         self.compat_graph = self._build_compat_graph()
     
-    def _convert_holes(self,f):
-        # '@baseform_pattern' => '@'
-        if f[0] == '@': return '@'
-        else: return f
+#    def _convert_holes(self,f):
+#        # '@baseform_pattern' => '@'
+#        if f[0] == '@': return '@'
+#        else: return f
             
     def _compatible(self,fs1,fs2):
         # check if two paradigms are form compatible.
@@ -92,15 +92,18 @@ class PClasses:
         print '\n  hole_pcount: %d\n  merged_pcount: %d\n  ambi_count: %d' % (len(self.ptable), i, len([xs for (_,xs) in ambi.iteritems() if len(xs) > 1]))
 
     def pr_cparadigms(self,pclasses):
-        for pclass in pclasses: #
-            fs = self.class_paradigm(pclass) # TODO: add msd
-            for p_name in pclass: # TODO: merge paradigms in class
+        paradigms = []
+        msds = [f.msd for f in self.paradigm(list(pclasses[0])[0])[1].forms]
+        for pclass in pclasses: 
+            fs = zip(self.class_paradigm(pclass), msds)
+            var_insts = []
+            for p_name in pclass:
                 (_,p) = phs.paradigm(p_name)
-                print p
-            # TODO: print class paradigm
-        
+                var_insts += p.var_insts
+            print paradigm.Paradigm(fs, var_insts)
+
 if __name__ == '__main__':
-   # try:
+   try:
         phs = PClasses(sys.argv[2]) # paradigms with holes
         cs  = phs.paradigm_classes(phs) # compute paradigm classes
         if sys.argv[1] == '-i':
@@ -109,5 +112,5 @@ if __name__ == '__main__':
             phs.pr_cparadigms(cs)
         else:
             print 'usage: python cparadigm.py [-i|-c] ph_file'
-   # except:
+   except:
         print 'usage: python cparadigm.py [-i|-c] ph_file'

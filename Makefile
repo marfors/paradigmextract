@@ -95,6 +95,38 @@ pshared:
 	python src/pextract.py < data/shared1_tr_verb_train.txt > paradigms/shared1_tr_verb_train.p
 	python src/pextract.py < data/shared1_tr_noun_train.txt > paradigms/shared1_tr_noun_train.p
 
+cpshared:
+	python src/cparadigm.py -c paradigms/shared1_ar_verb_train.p > paradigms/shared1_ar_verb_train.cp 
+	python src/cparadigm.py -c paradigms/shared1_ar_noun_train.p > paradigms/shared1_ar_noun_train.cp 
+	python src/cparadigm.py -c paradigms/shared1_ar_adj_train.p > paradigms/shared1_ar_adj_train.cp 
+
+	python src/cparadigm.py -c paradigms/shared1_ka_verb_train.p > paradigms/shared1_ka_verb_train.cp 
+	python src/cparadigm.py -c paradigms/shared1_ka_noun_train.p > paradigms/shared1_ka_noun_train.cp 
+	python src/cparadigm.py -c paradigms/shared1_ka_adj_train.p > paradigms/shared1_ka_adj_train.cp 
+
+	python src/cparadigm.py -c paradigms/shared1_nv_verb_train.p > paradigms/shared1_nv_verb_train.cp 
+	python src/cparadigm.py -c paradigms/shared1_nv_noun_train.p > paradigms/shared1_nv_noun_train.cp 
+
+	python src/cparadigm.py -c paradigms/shared1_es_verb_train.p > paradigms/shared1_es_verb_train.cp 
+	python src/cparadigm.py -c paradigms/shared1_es_noun_train.p > paradigms/shared1_es_noun_train.cp 
+	python src/cparadigm.py -c paradigms/shared1_es_adj_train.p > paradigms/shared1_es_adj_train.cp 
+
+	python src/cparadigm.py -c paradigms/shared1_fi_verb_train.p > paradigms/shared1_fi_verb_train.cp 
+	python src/cparadigm.py -c paradigms/shared1_fi_noun_train.p > paradigms/shared1_fi_noun_train.cp 
+	python src/cparadigm.py -c paradigms/shared1_fi_adj_train.p > paradigms/shared1_fi_adj_train.cp 
+
+	python src/cparadigm.py -c paradigms/shared1_de_verb_train.p > paradigms/shared1_de_verb_train.cp 
+	python src/cparadigm.py -c paradigms/shared1_de_noun_train.p > paradigms/shared1_de_noun_train.cp 
+	python src/cparadigm.py -c paradigms/shared1_de_adj_train.p > paradigms/shared1_de_adj_train.cp 
+
+	python src/cparadigm.py -c paradigms/shared1_ru_verb_train.p > paradigms/shared1_ru_verb_train.cp
+	python src/cparadigm.py -c paradigms/shared1_ru_noun_train.p > paradigms/shared1_ru_noun_train.cp
+	python src/cparadigm.py -c paradigms/shared1_ru_adj_train.p > paradigms/shared1_ru_adj_train.cp
+
+	python src/cparadigm.py -c paradigms/shared1_tr_verb_train.p > paradigms/shared1_tr_verb_train.cp
+	python src/cparadigm.py -c paradigms/shared1_tr_noun_train.p > paradigms/shared1_tr_noun_train.cp
+
+
 clean:
 	rm -f morph/*.foma morph/*.bin
 
