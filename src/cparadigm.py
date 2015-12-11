@@ -94,13 +94,13 @@ class PClasses:
     def pr_cparadigms(self,pclasses):
         paradigms = []
         msds = [f.msd for f in self.paradigm(list(pclasses[0])[0])[1].forms]
-        for pclass in pclasses: 
+        for (i,pclass) in enumerate(pclasses,1): 
             fs = zip(self.class_paradigm(pclass), msds)
             var_insts = []
             for p_name in pclass:
                 (_,p) = phs.paradigm(p_name)
                 var_insts += p.var_insts
-            print paradigm.Paradigm(fs, var_insts)
+            print paradigm.Paradigm(fs, var_insts,'p%d_' % i)  # FIXME: paradigm naming. add index. 
 
 if __name__ == '__main__':
    try:

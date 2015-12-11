@@ -27,10 +27,14 @@ class Paradigm:
     """
     
 
-    def __init__(self, form_msds, var_insts):
+    def __init__(self, form_msds, var_insts, prefix=None):
       self.p_info = {}
       self.forms = []
       self.var_insts = var_insts
+      if prefix == None:
+          self.prefix = ''
+      else:
+          self.prefix = prefix
       for (f,msd) in form_msds:
           self.forms.append(Form(f,msd,var_insts))
 
@@ -39,10 +43,10 @@ class Paradigm:
             return self.p_info[attr]
         else:
             if len(self.var_insts) != 0:
-                self.p_info['name'] = self.__call__(*[s for (_,s) in self.var_insts[0]])[0][0]
+                self.p_info['name'] = self.prefix + self.__call__(*[s for (_,s) in self.var_insts[0]])[0][0]
                 self.p_info['count'] = len(self.var_insts)
             else: # no variables
-                self.p_info['name'] = self.__call__()[0][0]
+                self.p_info['name'] = self.prefix + self.__call__()[0][0]
                 self.p_info['count'] = 1
             self.p_info['slots'] = self.__slots()
         return self.p_info[attr]
@@ -258,10 +262,9 @@ def load_file(file):
                     p_members.append(mem)
             else: # no variables
                 p_members = []
-            paradigm = Paradigm(wfs, p_members)
-            paradigms.append((paradigm.count,paradigm.name,paradigm))
+            paradigms.append((len(p_members),wfs,p_members))
     paradigms.sort(reverse=True)
-    return [p for (_,_,p) in paradigms]
+    return [Paradigm(wfs,p_members, 'p%d_' % i) for (i,(_,wfs,p_members)) in enumerate(paradigms,1)]
 
 def pr(i,b):
   if b: return '[v] %d' % (i)
