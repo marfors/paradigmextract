@@ -47,7 +47,7 @@ def read_data(fs):
 
 def exp(lang):
     models = glob.glob('../morph/' + lang + '*train_dev.foma.bin')
-    data = glob.glob('../data/' + lang + '*test.txt')
+    data = [f for f in glob.glob('../data/' + lang + '*test.txt') if '_h_' not in f]
     ps = processes(models)
     d = read_data(data)
     result = []

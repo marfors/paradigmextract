@@ -35,6 +35,8 @@ class PClasses:
         # build the compatibility adjacency graph
         compat_graph = defaultdict(set)
         for pid1 in self.ptable:
+            if pid1 not in compat_graph:
+                compat_graph[pid1] = set()
             for pid2 in self.ptable:
                 if pid1 != pid2:
                     if self._compatible(self.ptable[pid1][0], self.ptable[pid2][0]):
@@ -44,6 +46,7 @@ class PClasses:
     def paradigm_classes(self, ps):
         c_classes = []
         # start with the paradigm with the least number of compatible paradigms.
+        
         for (_,n) in sorted([(len(ns),n) for (n,ns) in self.compat_graph.iteritems()]):
             if c_classes == []:
                 c_classes = [set([n])]
@@ -73,14 +76,13 @@ class PClasses:
         return self.cforms
     
     def pr_info(self,cs):
-        
+        pn = 0  
         ambi = defaultdict(list)
-        for (i,c) in enumerate(cs,1): # compute ambiguity
+        for (pn,c) in enumerate(cs,1): # compute ambiguity
             for n in c:
-              ambi[n].append(i)
-                      
-        for (i,c) in enumerate(cs,1): # print paradigm classes
-            print '\nClass %d' % i 
+              ambi[n].append(pn)
+        for (pn,c) in enumerate(cs,1): # print paradigm classes
+            print '\nClass %d' % pn 
             for n in c:
                 fs = self.paradigm(n)[0] 
                 if len(ambi[n]) > 1:
@@ -89,7 +91,7 @@ class PClasses:
                     print ('    %s\t%s' % (' '.join(fs), n)).encode('utf-8')
             print (' => %s' % (' '.join(self.class_paradigm(c)))).encode('utf-8')
         # print some stats.
-        print '\n  hole_pcount: %d\n  merged_pcount: %d\n  ambi_count: %d' % (len(self.ptable), i, len([xs for (_,xs) in ambi.iteritems() if len(xs) > 1]))
+        print '\n  hole_pcount: %d\n  merged_pcount: %d\n  ambi_count: %d' % (len(self.ptable), pn, len([xs for (_,xs) in ambi.iteritems() if len(xs) > 1]))
 
     def pr_cparadigms(self,pclasses):
         paradigms = []
