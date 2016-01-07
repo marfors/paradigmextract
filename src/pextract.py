@@ -1,6 +1,7 @@
 import codecs
 import sys
 import itertools
+import re
 import paradigm
 
 # Wordgraph class to extract LCS
@@ -132,7 +133,19 @@ def longest_variable(string):
             thislen = 0
     return maxlen
 
+def count_infix_segments(string):
+    """Counts total number of infix segments, ignores @-strings."""
+    if u'[' not in string:
+        return 0
+    if u'@' in string:
+        return 0
+    nosuffix = re.sub('\][^\]]*$',']',string)
+    noprefix = re.sub('^[^\[]*\[','[',nosuffix)
+    nobrackets = re.sub('\[[^\]]*\]','',noprefix)
+    return len(nobrackets)
+
 def count_infixes(string):
+    """Counts total number of separate infix occurrences."""
     totalinfixes = 0
     infix = 0
     runninginfixcount = 0
@@ -331,7 +344,7 @@ def ffilter_shortest_string(factorlist):
     return [[x for x in w if len(x) == len(min(w, key=len))] for w in factorlist]
 
 def ffilter_shortest_infix(factorlist):
-    return [[x for x in w if count_infixes(x) == count_infixes(min(w, key=lambda x: count_infixes(x)))] for w in factorlist]
+    return [[x for x in w if count_infix_segments(x) == count_infix_segments(min(w, key=lambda x: count_infix_segments(x)))] for w in factorlist]
 
 def ffilter_longest_single_var(factorlist):
     return [[x for x in w if longest_variable(x) == longest_variable(max(w, key=lambda x: longest_variable(x)))] for w in factorlist]
@@ -368,7 +381,7 @@ def learnparadigms(inflectiontables):
             combinations = itertools.product(*factorlist)
             for c in combinations:
                 (numvars, variablelist) = evalfact(lcs, c)
-                infixcount = reduce(lambda x,y: x + count_infixes(y), c, 0)
+                infixcount = reduce(lambda x,y: x + count_infix_segments(y), c, 0)
                 variabletable = [string_to_varstring(s, variablelist) for s in c]
                 combos.append([table,c,variabletable,variablelist,numvars,infixcount])
 
