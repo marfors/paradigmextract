@@ -1,7 +1,7 @@
 1+á+2:BF=1#@+1+á+2:gen=MASC,num=SG#@+1+á+2:gen=FEM,num=SG#@+1+á+2:gen=MASC,num=PL#1+a+2+as:gen=FEM,num=PL	1=alem,2=n
 1+z:BF=1#@+1+z:gen=MASC,num=SG#@+1+z:gen=FEM,num=SG#1+ces:gen=MASC,num=PL#@+1+z:gen=FEM,num=PL	1=montara
+1+u+2+3+o:BF=1#@+1+u+2+3+o:gen=MASC,num=SG#@+1+u+2+3+o:gen=FEM,num=SG#@+1+u+2+3+o:gen=MASC,num=PL#1+2+u+3+as:gen=FEM,num=PL	1=grad,2=a,3=d
 1+a:BF=1#@+1+a:gen=MASC,num=SG#1+o:gen=FEM,num=SG#@+1+a:gen=MASC,num=PL#@+1+a:gen=FEM,num=PL	1=disgustad
-1+2+3+do:BF=1#@+1+2+3+do:gen=MASC,num=SG#@+1+2+3+do:gen=FEM,num=SG#@+1+2+3+do:gen=MASC,num=PL#1+a+2+d+3+s:gen=FEM,num=PL	1=grad,2=u,3=a
 1+í+2:BF=1#@+1+í+2:gen=MASC,num=SG#@+1+í+2:gen=FEM,num=SG#1+i+2+es:gen=MASC,num=PL#1+i+2+as:gen=FEM,num=PL	1=kirgu,2=s#1=catr,2=n
 1+é+2:BF=1#@+1+é+2:gen=MASC,num=SG#1+e+2+a:gen=FEM,num=SG#1+e+2+es:gen=MASC,num=PL#1+e+2+as:gen=FEM,num=PL	1=neozeland,2=s#1=gabon,2=s#1=aran,2=s#1=congol,2=s#1=aragon,2=s#1=island,2=s#1=jaen,2=s#1=alav,2=s
 1+ó+2:BF=1#@+1+ó+2:gen=MASC,num=SG#1+o+2+a:gen=FEM,num=SG#1+o+2+es:gen=MASC,num=PL#1+o+2+as:gen=FEM,num=PL	1=burl,2=n#1=trip,2=n#1=fris,2=n#1=gordinfl,2=n#1=nalg,2=n#1=querend,2=n#1=mam,2=n#1=huev,2=n#1=cimarr,2=n

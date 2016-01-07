@@ -30,4 +30,4 @@
 1+ó+2:BF=1#@+1+ó+2:gen=MASC,num=SG#@+1+ó+2:gen=FEM,num=SG#@+1+ó+2:gen=MASC,num=PL#1+o+2+as:gen=FEM,num=PL	1=trip,2=n#1=fris,2=n#1=gordinfl,2=n#1=nalg,2=n
 1+ó+2:BF=1#@+1+ó+2:gen=MASC,num=SG#1+o+2+a:gen=FEM,num=SG#@+1+ó+2:gen=MASC,num=PL#1+o+2+as:gen=FEM,num=PL	1=querend,2=n
 1:BF=1#1:gen=MASC,num=SG#@+1:gen=FEM,num=SG#@+1:gen=MASC,num=PL#1+as:gen=FEM,num=PL	1=sentenciador
-1+2+3+do:BF=1#@+1+2+3+do:gen=MASC,num=SG#@+1+2+3+do:gen=FEM,num=SG#@+1+2+3+do:gen=MASC,num=PL#1+a+2+d+3+s:gen=FEM,num=PL	1=grad,2=u,3=a
+1+u+2+3+o:BF=1#@+1+u+2+3+o:gen=MASC,num=SG#@+1+u+2+3+o:gen=FEM,num=SG#@+1+u+2+3+o:gen=MASC,num=PL#1+2+u+3+as:gen=FEM,num=PL	1=grad,2=a,3=d
