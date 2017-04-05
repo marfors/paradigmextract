@@ -34,7 +34,7 @@ class Paradigm:
       if prefix == None:
           self.prefix = ''
       else:
-          self.prefix = prefix
+          self.prefix = prefix         
       for (f,msd) in form_msds:
           self.forms.append(Form(f,msd,var_insts))
 
@@ -63,8 +63,9 @@ class Paradigm:
         vt = defaultdict(list)
         for vs in self.var_insts:
             for (v,s) in vs:
-                vt[v].append(s)
+                vt[v].append(s)        
         var_slots = vt.items()
+        var_slots.sort(key=lambda x: x[0])
         (s_index,v_index) = (0,0)
         for i in range(len(str_slots) + len(var_slots)): # interleave strings and variables
             if i % 2 == 0:
@@ -290,5 +291,3 @@ if __name__ == '__main__':
             print
     else:
             print 'Usage: <program> [-p|-s] <paradigm_file>'
-
-
