@@ -27,7 +27,7 @@ def escape_fixed_string(string):
         return u'{' + string + u'}'
 
 def nospace(string):
-    return string.replace(' ','=')
+    return string.replace(' ','=').replace('_','=')
 
 def paradigms_to_alphabet(paradigms):
     """Extracts all used symbols from an iterable of paradigms."""
@@ -44,12 +44,16 @@ def paradigms_to_foma(paradigms, grammarname, pval):
     rstring = u''
     defstring = u''
     substring = u''
-
+    par_is_constrained = {}
+    
     alphabet = paradigms_to_alphabet(paradigms)
     alphabet = {'"' + a + '"' for a in alphabet}
     alphstring = 'def Alph ' + u'|'.join(alphabet) + ';\n'
-
+    
     for paradigm in paradigms:
+        if paradigm.count < 3 and grammarname == 'Gunconstrained':
+            continue
+        par_is_constrained[paradigm.name] = False
         parstrings = []
         for formnumber, form in enumerate(paradigm.forms):
             tagstrings = map(lambda(feature, value): u'"' + feature + u'"' + u' = ' + u'"' + value + u'"' , form.msd)
@@ -58,8 +62,10 @@ def paradigms_to_foma(paradigms, grammarname, pval):
                 if is_var:
                     parvarname = nospace(paradigm.name) + '=var' + str(idx)
                     if parvarname not in parvars:
-                        r = genregex.genregex(slot, pvalue = pval)
+                        r = genregex.genregex(slot, pvalue = pval, length = False)
                         parvars[parvarname] = True
+                        if r.fomaregex() != '?+':
+                            par_is_constrained[paradigm.name] = True
                         defstring += 'def ' + parvarname + ' ' + r.fomaregex().replace('?', 'Alph') + ';\n'
                     parstring += ' [' + parvarname + '] '
                 else:
@@ -68,20 +74,26 @@ def paradigms_to_foma(paradigms, grammarname, pval):
                     parstring += u' [' + thisslot + u':' + baseformslot + u'] '
             parstring += u'0:["[" ' + u' " " '.join(tagstrings) + u' "]"]'
             parstrings.append(parstring)
-        rstring += u'def ' + nospace(paradigm.name) + u'|\n'.join(parstrings) + u';\n'
-
-    parnames = [nospace(paradigm.name) for paradigm in paradigms if ' ' not in paradigm.name]
+        if grammarname != 'Gconstrained' or par_is_constrained[paradigm.name]:
+            rstring += u'def ' + nospace(paradigm.name) + u'|\n'.join(parstrings) + u';\n'
+    
+    #parnames = [nospace(paradigm.name) for paradigm in paradigms if ' ' not in paradigm.name]
+    parnames = []
+    for paradigm in paradigms:
+        if ' ' not in paradigm.name and (grammarname != 'Gconstrained' or par_is_constrained[paradigm.name]):
+            parnames.append(nospace(paradigm.name))
+    
     rstring += u'def ' + grammarname + u' ' + u' | '.join(parnames) + u';'
-
+    
     return alphstring + defstring + rstring
 
 def main(argv):
-
+    
     options, remainder = getopt.gnu_getopt(argv[1:],
         'ocup:sn:', ['original','constrained','unconstrained','pvalue','separate','name'])
-
+    
     pv = 0.05
-
+    
     (Goriginal, Gconstrained, Gunconstrained, Gseparate, Gname) = False, False, False, False, 'analyzer.bin'
     for opt, arg in options:
         if opt in ('-o', '--original'):
@@ -96,19 +108,19 @@ def main(argv):
             pv = float(arg)
         elif opt in ('-n', '--name'):
             Gname = arg
-
+    
     paradigms = paradigm.load_file(remainder[0])
-
+    
     analyzers = []
     analyzernames = []
     for analyzertype in (('Goriginal', 1.0), ('Gconstrained', pv), ('Gunconstrained', 0.0)):
         if eval(analyzertype[0]) == True:
             analyzers.append(paradigms_to_foma(paradigms, analyzertype[0], analyzertype[1]))
             analyzernames.append(analyzertype[0])
-
+    
     for a in analyzers:
         print a.encode('utf-8')
-
+    
     if len(analyzers) > 0:
         if Gseparate == True:
             for a in analyzernames:
