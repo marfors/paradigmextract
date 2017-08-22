@@ -5,7 +5,7 @@ class genregex:
        prefixes in the set that seem to be restricted in their distribution
        and issue a regular expression (Python or foma), that matches a limited
        set of strings.
-
+       
        This is achieved through a number of tests.
        We first make the assumption that strings in a set are drawn from a
        uniform distribution with n members.  Then, we
@@ -23,20 +23,20 @@ class genregex:
        We also examine the distribution of string lengths. If, by the same analysis,
        the lengths of strings can be assumed to be drawn from a fixed set, we
        limit the set of allowable lengths.
-
+       
        A regex can be returned either for python or foma. The regex
        may need to check both the prefix and suffixes separately, which
        is easily done in a foma-style regex since we can intersect the
        prefix and suffix languages separately:
-       
+         
          [?* suffixes] & [prefixes ?*] & [?^{minlen, maxlen}]
-
+       
        However, this can't be directly done in Python.  To simulate this,
        we check the suffix (and possible length constraints) by a lookahead
        which doesn't consume any symbols, before the checking the prefix, ie.
-       
+         
          ^(?=.*suffixes$)(?=.{minlen, maxlen})prefixes
-
+       
        Example:
        >>>words = ['ab','ab','ab','ba','ba','ba','ab','ba','a','b']
        >>>r = genregex.genregex(words)
@@ -46,13 +46,13 @@ class genregex:
        [?* [{a}|{b}]] & [?^{1,2}] & [[{a}|{b}] ?*]
        """
     
-    def __init__(self, strings, pvalue = 0.05):
+    def __init__(self, strings, pvalue = 0.05, length = True):
         self.strings = strings
         self.numstrings = len(self.strings)
         self.pvalue = pvalue
         self.minlen = len(min(self.strings, key = len))
         self.maxlen = len(max(self.strings, key = len))
-        
+        self.length = length
         self.stringset = set()
         self.prefixset = set()
         self.suffixset = set()
@@ -75,11 +75,12 @@ class genregex:
                 self.prefixset = set(prefstrings)
                 break
         # Case (2c): find out if stringlengths have limited distribution
-        stringlengths = set(map(lambda x: len(x), self.strings))
-        if self._significancetest(self.numstrings, len(stringlengths)):
-            self.lenrange = (self.minlen, self.maxlen)
+        if self.length:
+            stringlengths = set(map(lambda x: len(x), self.strings))
+            if self._significancetest(self.numstrings, len(stringlengths)):
+                self.lenrange = (self.minlen, self.maxlen)
         return
-
+    
     def fomaregex(self):
         # [?* suffix] & [prefix ?*] & [?^{min,max}]
         def explode(string):
@@ -98,7 +99,7 @@ class genregex:
             return u'?+'
         else:
             return ' & '.join(re)
-        
+    
     def pyregex(self):
         # ^(?=.*suffix$)(?=.{min,max}$)prefix
         re = u''
@@ -114,7 +115,7 @@ class genregex:
             return u'.+'
         else:
             return '^' + re
-                    
+    
     def _significancetest(self, num, uniq):
         if (1.0-(1.0/(uniq+1.0))) ** num <= self.pvalue:
             return True
