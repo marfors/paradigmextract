@@ -51,8 +51,8 @@ def paradigms_to_foma(paradigms, grammarname, pval):
     alphstring = 'def Alph ' + u'|'.join(alphabet) + ';\n'
     
     for paradigm in paradigms:
-        if paradigm.count < 3 and grammarname == 'Gunconstrained':
-            continue
+  #      if paradigm.count < 3 and grammarname == 'Gunconstrained':
+  #          continue
         par_is_constrained[paradigm.name] = False
         parstrings = []
         for formnumber, form in enumerate(paradigm.forms):
@@ -74,14 +74,14 @@ def paradigms_to_foma(paradigms, grammarname, pval):
                     parstring += u' [' + thisslot + u':' + baseformslot + u'] '
             parstring += u'0:["[" ' + u' " " '.join(tagstrings) + u' "]"]'
             parstrings.append(parstring)
-        if grammarname != 'Gconstrained' or par_is_constrained[paradigm.name]:
-            rstring += u'def ' + nospace(paradigm.name) + u'|\n'.join(parstrings) + u';\n'
+        #if grammarname != 'Gcodnstrained' or par_is_constrained[paradigm.name]:
+        rstring += u'def ' + nospace(paradigm.name) + u'|\n'.join(parstrings) + u';\n'
     
     #parnames = [nospace(paradigm.name) for paradigm in paradigms if ' ' not in paradigm.name]
     parnames = []
     for paradigm in paradigms:
-        if ' ' not in paradigm.name and (grammarname != 'Gconstrained' or par_is_constrained[paradigm.name]):
-            parnames.append(nospace(paradigm.name))
+        #if ' ' not in paradigm.name and (grammarname != 'Gconstrdained' or par_is_constrained[paradigm.name]):
+        parnames.append(nospace(paradigm.name))
     
     rstring += u'def ' + grammarname + u' ' + u' | '.join(parnames) + u';'
     
